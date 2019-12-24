@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:checkableBehavior="single">
+
+        <item android:id="@+id/changePassword"
+        android:title="Change password"
+        android:icon="@drawable/ic_security"/>
+
+        <item android:id="@+id/logoutDrawer"
+            android:title="Logout"
+            android:icon="@drawable/ic_logout"/>
+
+        <item android:id="@+id/suggest"
+            android:title="Suggest to a fellow developer"
+            android:icon="@drawable/ic_share"/>
+
+
+        <item android:title="Developer">
+            <menu>
+                <item android:id="@+id/aboutDeveloperDialogFragment"
+                    android:title="About Developer"
+                    android:icon="@drawable/ic_info" />
+
+                <item android:id="@+id/rateApp"
+                    android:title="Rate app on Playstore"
+                    android:icon="@drawable/ic_star" />
+
+                <item android:id="@+id/removeAds"
+                    android:title="Remove ads"
+                    android:icon="@drawable/ic_not_interested"/>
+
+            </menu>
+
+        </item>
+
+    </group>
+
+
+
+</menu>
