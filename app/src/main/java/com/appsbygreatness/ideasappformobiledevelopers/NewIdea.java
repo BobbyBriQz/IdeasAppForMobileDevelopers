@@ -45,12 +45,11 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
     ArrayList<Idea> ideas;
     Bitmap bitmap;
-    //ArrayList<Bitmap> bitmaps;
+
     BitmapAdapter adapter;
 
-    String imageName, fullPath;
+    String imageName, fullPath = "/data/user/0/com.appsbygreatness.ideasappformobiledevelopers/app_Images";
 
-    ArrayList<String> fullPaths;
     ArrayList<String> imageNames;
 
     public static final int NEW_IDEAS_RESULTCODE = 11;
@@ -84,10 +83,10 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         ideas = Singleton.getInstance().getIdea();
 
         //bitmaps = new ArrayList<>();
-        fullPaths = new ArrayList<>();
+//        fullPaths = new ArrayList<>();
         imageNames = new ArrayList<>();
 
-        adapter = new BitmapAdapter(fullPaths, imageNames,this, this, this);
+        adapter = new BitmapAdapter(fullPath, imageNames,this, this, this);
 
         newRV.setAdapter(adapter);
         newRV.setLayoutManager(new LinearLayoutManager( this, LinearLayoutManager.HORIZONTAL, false));
@@ -140,7 +139,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         Intent saveNewIdea = new Intent(getApplicationContext(), ViewIdeas.class);
         saveNewIdea.putExtra("position", 0);
 
-        ideas.add(new Idea(appName, appIdea, functionality, todo, timeStamp, fullPaths, imageNames));
+        ideas.add(new Idea(appName, appIdea, functionality, todo, timeStamp, fullPath, imageNames));
 
         setResult(NEW_IDEAS_RESULTCODE, saveNewIdea);
         finish();
@@ -180,11 +179,9 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
 
-               //bitmaps.add(bitmap);
                 SaveToInternalStorage saveObject = new SaveToInternalStorage();
                 fullPath = saveObject.execute(bitmap).get();
 
-                fullPaths.add(fullPath);
 
                 adapter.notifyDataSetChanged();
 
@@ -216,7 +213,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         imageNames.remove(bitmapPosition);
-                        fullPaths.remove(bitmapPosition);
 
                         adapter.notifyDataSetChanged();
 
@@ -245,6 +241,8 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
             File directory = cw.getDir("Images", Context.MODE_PRIVATE);
 
+            fullPath = directory.getAbsolutePath();
+
             File mypath = new File(directory, (imageName));
 
             FileOutputStream fileOutputStream = null;
@@ -259,7 +257,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
                 fileOutputStream.close();
                 Log.i("NewIdea", "Save: Successful");
-                //loadBitmapToImageView(directory.getAbsolutePath());
 
                 return directory.getAbsolutePath();
 

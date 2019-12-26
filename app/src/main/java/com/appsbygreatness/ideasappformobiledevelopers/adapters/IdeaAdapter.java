@@ -60,7 +60,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
         if (ideas.get(i).getImageNames().size() >= 1) {
 
-            File f = new File((ideas.get(i).getFullpaths().get((0))), (ideas.get(i).getImageNames().get(0)));
+            File f = new File((ideas.get(i).getFullpath()), (ideas.get(i).getImageNames().get(0)));
 
             Bitmap bitmap = null;
             try {

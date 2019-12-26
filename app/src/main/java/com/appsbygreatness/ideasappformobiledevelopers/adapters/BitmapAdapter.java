@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder> {
 
     //private ArrayList<Bitmap> bitmaps;
-    private ArrayList<String> fullPaths;
+    private String fullPath;
     private ArrayList<String> imageNames;
 
 
@@ -29,16 +29,15 @@ public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder
     OnBitmapClickListener onBitmapClickListener;
     OnLongBitmapClickListener onLongBitmapClickListener;
 
-    public BitmapAdapter(ArrayList<String> fullPaths, ArrayList<String> imageNames, Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
+    public BitmapAdapter(String fullPath, ArrayList<String> imageNames, Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
         //this.bitmaps = bitmaps;
 
-        /*this.fullPaths = new ArrayList<>();
+        /*this.fullPath = new ArrayList<>();
         this.imageNames = new ArrayList<>();*/
 
-        if(fullPaths != null){
 
-            this.fullPaths = fullPaths;
-        }
+        this.fullPath = fullPath;
+
 
         if(imageNames != null){
 
@@ -64,7 +63,7 @@ public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder
 
         if (imageNames.size() >= 1) {
 
-            File f = new File((fullPaths.get((i))), (imageNames.get(i)));
+            File f = new File(fullPath, (imageNames.get(i)));
 
             Bitmap bitmap = null;
             try {

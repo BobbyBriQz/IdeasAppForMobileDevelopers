@@ -86,7 +86,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
         Log.i("DetailedPage", "Singleton: successfull ");
 
-        adapter = new BitmapAdapter(ideas.get(position).getFullpaths(), ideas.get(position).getImageNames(), this, this, this);
+        adapter = new BitmapAdapter(ideas.get(position).getFullpath(), ideas.get(position).getImageNames(), this, this, this);
 
         detailedRV.setAdapter(adapter);
         detailedRV.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) );
@@ -119,7 +119,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
                 fullPath = saveObject.execute(bitmap).get();
 
 
-                ideas.get(position).addFullpath(fullPath);
+                ideas.get(position).setFullPath(fullPath);
 
                 adapter.notifyDataSetChanged();
 
@@ -291,7 +291,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         ideas.get(position).getImageNames().remove(bitmapPosition);
-                        ideas.get(position).getFullpaths().remove(bitmapPosition);
+
 
                         adapter.notifyDataSetChanged();
 

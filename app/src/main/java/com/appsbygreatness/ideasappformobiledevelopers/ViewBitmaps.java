@@ -38,7 +38,7 @@ public class ViewBitmaps extends AppCompatActivity {
 
         if (ideas.get(ideaPosition).getImageNames().size() >= 1) {
 
-            File f = new File((ideas.get(ideaPosition).getFullpaths().get((bitmapPosition))), (ideas.get(ideaPosition).getImageNames().get(bitmapPosition)));
+            File f = new File((ideas.get(ideaPosition).getFullpath()), (ideas.get(ideaPosition).getImageNames().get(bitmapPosition)));
 
             Bitmap bitmap = null;
             try {
