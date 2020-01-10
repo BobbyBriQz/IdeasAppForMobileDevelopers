@@ -21,14 +21,14 @@
             android:id="@+id/ideaPic"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/ic_launcher_background"
             android:contentDescription="This is the image of the idea"
             android:scaleType="centerCrop"
-            android:background="@drawable/ic_launcher_background"
-            app:layout_constraintStart_toStartOf="@id/constrainLayout"
-            app:layout_constraintEnd_toStartOf="@id/guideline1"
-            app:layout_constraintTop_toTopOf="@id/constrainLayout"
+            android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintBottom_toBottomOf="@id/constrainLayout"
-            android:src="@drawable/ic_launcher_foreground"/>
+            app:layout_constraintEnd_toStartOf="@id/guideline1"
+            app:layout_constraintStart_toStartOf="@id/constrainLayout"
+            app:layout_constraintTop_toTopOf="@id/constrainLayout" />
 
         <TextView
             android:id="@+id/ideaNameTV"
@@ -38,20 +38,36 @@
             android:paddingStart="10dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/guideline2"
+            app:layout_constraintBottom_toTopOf="@id/guideline3"
             app:layout_constraintEnd_toEndOf="@id/constrainLayout"
             app:layout_constraintStart_toEndOf="@id/guideline1"
             app:layout_constraintTop_toTopOf="@id/constrainLayout" />
+
+        <TextView
+            android:id="@+id/appIdeaTV"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingTop="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:maxLines="4"
+            android:ellipsize="end"
+            app:layout_constraintBottom_toTopOf="@id/guideline2"
+            app:layout_constraintEnd_toEndOf="@id/constrainLayout"
+            app:layout_constraintStart_toEndOf="@id/guideline1"
+            app:layout_constraintTop_toBottomOf="@id/guideline3" />
 
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:background="?android:attr/listDivider"
-            app:layout_constraintStart_toEndOf="@id/guideline1"
-            app:layout_constraintTop_toBottomOf="@id/guideline2"
             app:layout_constraintBottom_toTopOf="@id/ideaTimestampTV"
-            app:layout_constraintEnd_toEndOf="@id/constrainLayout"/>
+            app:layout_constraintEnd_toEndOf="@id/constrainLayout"
+            app:layout_constraintStart_toEndOf="@id/guideline1"
+            app:layout_constraintTop_toBottomOf="@id/guideline2" />
 
         <TextView
             android:id="@+id/ideaTimestampTV"
@@ -77,6 +93,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.8" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.3" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

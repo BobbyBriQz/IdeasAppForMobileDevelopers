@@ -29,9 +29,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
+import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
+import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,11 +46,13 @@ import java.util.Locale;
 public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener{
 
     EditText detailedAppName, detailedAppIdea, detailedFunctionality, detailedTodo;
-    int position;
-    ArrayList<Idea> ideas;
+    int id;
+    Idea idea;
+    RecyclerView detailedRV;
     BitmapAdapter adapter;
     Bitmap bitmap;
     String imageName, fullPath;
+    IdeaRepository ideaRepository;
 
     public static final int DETAILED_PAGE_RESULTCODE = 12;
     public static final int IMPORT_IMAGE_REQUESTCODE = 111;
@@ -65,40 +71,64 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             @Override
             public void onClick(View view) {
 
-                finish();
+                killActivity();
             }
         });
 
-        RecyclerView detailedRV = findViewById(R.id.detailedRV);
+        detailedRV = findViewById(R.id.detailedRV);
 
         Intent intent = getIntent();
 
-        position = intent.getIntExtra("Position", 0);
+        id = intent.getIntExtra("id", 0);
 
 
         detailedAppName = findViewById(R.id.detailedAppName);
         detailedAppIdea = findViewById(R.id.detailedAppIdea);
         detailedFunctionality = findViewById(R.id.detailedFunctionality);
         detailedTodo = findViewById(R.id.detailedTodo);
+        ideaRepository = new IdeaRepository(this);
 
 
-        ideas = Singleton.getInstance().getIdea();
 
-        Log.i("DetailedPage", "Singleton: successfull ");
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+               idea =  ideaRepository.getIdea(id);
+                setUpRecyclerView();
 
-        adapter = new BitmapAdapter(ideas.get(position).getFullpath(), ideas.get(position).getImageNames(), this, this, this);
+                AppExecutors.getInstance().getMainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUI();
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    private void killActivity() {
+        Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void updateUI() {
+
+        detailedAppName.setText(idea.getName());
+        detailedAppIdea.setText(idea.getIdea());
+        detailedFunctionality.setText(idea.getFunctionality());
+        detailedTodo.setText(idea.getTodo());
+
+    }
+
+    private void setUpRecyclerView() {
+
+        adapter = new BitmapAdapter(idea.getFullpath(), idea.getImageNames(), this, this, this);
 
         detailedRV.setAdapter(adapter);
         detailedRV.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) );
-
-
-
-
-        detailedAppName.setText(ideas.get(position).getName());
-        detailedAppIdea.setText(ideas.get(position).getIdea());
-        detailedFunctionality.setText(ideas.get(position).getFunctionality());
-        detailedTodo.setText(ideas.get(position).getTodo());
-
     }
 
     @Override
@@ -119,7 +149,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
                 fullPath = saveObject.execute(bitmap).get();
 
 
-                ideas.get(position).setFullPath(fullPath);
+                idea.setFullPath(fullPath);
 
                 adapter.notifyDataSetChanged();
 
@@ -134,8 +164,6 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
         }
 
-
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -149,7 +177,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             Date date = Calendar.getInstance().getTime();
             imageName = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date) + "jpg";
 
-            ideas.get(position).addImageName(imageName);
+            idea.addImageName(imageName);
 
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
@@ -222,17 +250,23 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         String timeStamp = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date);
 
 
-        Intent intentSave = new Intent(DetailedPage.this, ViewIdeas.class);
 
-        ideas.get(position).setName(detailedAppName.getText().toString());
-        ideas.get(position).setIdea(detailedAppIdea.getText().toString());
-        ideas.get(position).setFunctionality(detailedFunctionality.getText().toString());
-        ideas.get(position).setTodo(detailedTodo.getText().toString());
-        ideas.get(position).setTimestamp(timeStamp);
 
-        setResult(DETAILED_PAGE_RESULTCODE, intentSave);
+        idea.setName(detailedAppName.getText().toString());
+        idea.setIdea(detailedAppIdea.getText().toString());
+        idea.setFunctionality(detailedFunctionality.getText().toString());
+        idea.setTodo(detailedTodo.getText().toString());
+        idea.setTimestamp(timeStamp);
 
-        finish();
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                ideaRepository.updateIdea(idea);
+                killActivity();
+            }
+        });
+
+
     }
 
     public void importImage(){
@@ -273,14 +307,16 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
         Intent intent = new Intent(getApplicationContext(), ViewBitmaps.class);
 
-        intent.putExtra("Idea position", position);
-        intent.putExtra("Bitmap position", bitmapPosition);
+        intent.putExtra("Image path", idea.getFullPath());
+        intent.putExtra("Image name", idea.getImageNames().get(bitmapPosition));
 
         startActivity(intent);
     }
 
     @Override
     public void onLongBitmapClick(final int bitmapPosition) {
+
+        final String imageNameToBeDeleted = idea.getImageNames().get(bitmapPosition);
 
         new AlertDialog.Builder(this)
                 .setTitle("Delete App Idea")
@@ -290,17 +326,36 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ideas.get(position).getImageNames().remove(bitmapPosition);
+                        idea.getImageNames().remove(bitmapPosition);
 
+                        if(deleteImage(idea.getFullPath(), imageNameToBeDeleted)){
+                            Toast.makeText(getApplicationContext(),
+                                    "Picture deleted",
+                                    Toast.LENGTH_SHORT).show();
+                        }
 
                         adapter.notifyDataSetChanged();
 
-                        Toast.makeText(getApplicationContext(),
-                                "Picture deleted",
-                                Toast.LENGTH_SHORT).show();
+
 
                     }
                 }).show();
 
+    }
+
+
+    public boolean deleteImage(String imagePath, String imageName){
+
+        File f = new File(imagePath, imageName);
+
+        boolean imageIsDeleted = false;
+        try {
+            imageIsDeleted = f.delete();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return imageIsDeleted;
     }
 }

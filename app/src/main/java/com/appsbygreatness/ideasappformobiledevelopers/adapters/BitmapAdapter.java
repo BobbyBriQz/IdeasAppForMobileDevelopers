@@ -17,19 +17,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder> {
 
     //private ArrayList<Bitmap> bitmaps;
     private String fullPath;
-    private ArrayList<String> imageNames;
+    private List<String> imageNames;
 
 
     Context context;
     OnBitmapClickListener onBitmapClickListener;
     OnLongBitmapClickListener onLongBitmapClickListener;
 
-    public BitmapAdapter(String fullPath, ArrayList<String> imageNames, Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
+    public BitmapAdapter(String fullPath, List<String> imageNames, Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
         //this.bitmaps = bitmaps;
 
         /*this.fullPath = new ArrayList<>();

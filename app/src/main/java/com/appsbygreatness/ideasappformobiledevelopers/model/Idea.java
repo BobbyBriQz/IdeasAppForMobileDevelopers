@@ -1,17 +1,60 @@
 package com.appsbygreatness.ideasappformobiledevelopers.model;
 
-import java.util.ArrayList;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
+import com.appsbygreatness.ideasappformobiledevelopers.ListConverter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity(tableName = "idea_table")
 public class Idea {
 
+    @PrimaryKey( autoGenerate = true)
+    private int id;
+
     private String name;
+
     private String idea;
+
     private String functionality;
+
     private String todo;
+
     private String timestamp;
+
+    @ColumnInfo(name = "full_path")
     private String fullPath;
 
-    private ArrayList<String> imageNames;
+    @ColumnInfo(name = "image_names")
+    @TypeConverters({ListConverter.class})
+    private List<String> imageNames;
+
+    public Idea(int id, String name, String idea, String functionality, String todo, String timestamp,
+                String fullPath, List<String> imageNames) {
+        this.id = id;
+        this.name = name;
+        this.idea = idea;
+        this.functionality = functionality;
+        this.todo = todo;
+        this.timestamp = timestamp;
+
+        this.fullPath = fullPath;
+        this.imageNames = new ArrayList<>();
+
+
+
+        if(imageNames != null && imageNames.size() > 0){
+
+            this.imageNames = imageNames;
+        }
+
+    }
+
 
     public Idea(String name, String idea, String functionality, String todo, String timestamp,
                 String fullpath, ArrayList<String> imageNames) {
@@ -40,7 +83,7 @@ public class Idea {
     }
 
 
-    public ArrayList<String> getImageNames() {
+    public List<String> getImageNames() {
         return imageNames;
     }
 
@@ -92,5 +135,21 @@ public class Idea {
 
 
     public void setFullPath(String fullPath) {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getFullPath() {
+        return fullPath;
+    }
+
+    public void setImageNames(ArrayList<String> imageNames) {
+        this.imageNames = imageNames;
     }
 }

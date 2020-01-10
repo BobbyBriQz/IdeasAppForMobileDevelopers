@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.IdeaAdapter;
+import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.fragments.AboutDeveloperDialogFragment;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
+import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -32,22 +34,26 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaClickListener,
         IdeaAdapter.OnLongIdeaClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     //List of fields with global scope that will be used within class two or more class methods
-    private ArrayList<Idea> ideas;
+    private List<Idea> ideas;
     private static IdeaAdapter ideaAdapter;
+    RecyclerView recyclerView;
     SharedPreferences preferences;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     TextView drawerUsername, drawerAppCount;
     View headerView;
     NavigationView navigationView;
+    IdeaRepository ideaRepository;
 
     private static final String TAG = "ViewIdeas";
 
@@ -75,18 +81,12 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         FloatingActionButton floatingActionButton = findViewById(R.id.floatingActionButton);
 
         //RecyclerView that displays the ideas
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
 
 
         //setupPreferences() retrieve persisted data from the datastore and links to ideas list
         setupPreferences();
 
-        //RecyclerView custom IdeaAdapter is created with the ideas list
-        ideaAdapter = new IdeaAdapter(this, ideas, this, this);
-
-        //Adapter is attached to the recyclerView instance and preferred Layout is set
-        recyclerView.setAdapter(ideaAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
         //Fab that starts activity for the creation of a new idea
@@ -95,7 +95,8 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
             public void onClick(View view) {
 
                 Intent intent = new Intent(getApplicationContext(), NewIdea.class);
-                startActivityForResult(intent, 2);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -107,7 +108,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         drawerUsername = headerView.findViewById(R.id.drawerUserName);
         drawerUsername.setText(preferences.getString("Username", ""));
 
-        updateHeaderAppCount();
+
 
     }
 
@@ -136,14 +137,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        updateHeaderAppCount();
-
-        ideaAdapter.notifyDataSetChanged();
-    }
 
 
     //Starts an activity after an idea is clicked on in the recyclerView
@@ -152,9 +145,12 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         Intent intent = new Intent(getApplicationContext(), DetailedPage.class);
 
-        intent.putExtra("Position", position);
+        int id = ideas.get(position).getId();
 
-        startActivityForResult(intent, 9);
+        intent.putExtra("id", id);
+
+        startActivity(intent);
+        finish();
 
 
     }
@@ -165,6 +161,8 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     public void onLongIdeaClick(final int position) {
         //Set up functionality to delete
 
+        final Idea ideaToBeDeleted = ideas.get(position);
+
         new AlertDialog.Builder(this)
                 .setTitle("Delete App Idea")
                 .setIcon(R.drawable.ic_delete)
@@ -173,22 +171,49 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
+                        deleteImages(ideaToBeDeleted.getFullPath(),
+                                        ideaToBeDeleted.getImageNames());
+
+                        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                //Delete idea
+                                ideaRepository.deleteIdea(ideaToBeDeleted);
+
+                            }
+                        });
+
                         ideas.remove(position);
 
-
-
                         Toast.makeText(getApplicationContext(),
-                                 " App idea deleted",
+                                " App idea deleted",
                                 Toast.LENGTH_SHORT).show();
 
                         updateHeaderAppCount();
 
-
                         ideaAdapter.notifyDataSetChanged();
+
                     }
                 }).show();
 
 
+    }
+
+    private void deleteImages(String imagePath, List<String> imageNames) {
+
+        for(String imageName : imageNames){
+            File f = new File(imagePath, imageName);
+
+
+            try {
+                f.delete();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -308,55 +333,78 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     public void setupPreferences() {
 
         preferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-        ArrayList<Idea> emptyArray = new ArrayList<>();
-        Gson gson = new Gson();
-        String emptyArrayOfIdeas = gson.toJson(emptyArray);
+//        ArrayList<Idea> emptyArray = new ArrayList<>();
+//        Gson gson = new Gson();
+//        String emptyArrayOfIdeas = gson.toJson(emptyArray);
+//
+//        if (!preferences.getString("Ideas", emptyArrayOfIdeas).equals(emptyArrayOfIdeas)) {
+//
+//
+//            String json = preferences.getString("Ideas", emptyArrayOfIdeas);
+//
+//            Type type = new TypeToken<ArrayList<Idea>>(){}.getType();
+//
+//            ArrayList<Idea> ideasToBeLoaded = gson.fromJson(json, type);
+//
+//            Singleton.getInstance().loadIdeas(ideasToBeLoaded);
+//
+//            ideas = Singleton.getInstance().getIdea();
+//
+//        }else{
+//
+//            ideas = Singleton.getInstance().getIdea();
+//
+//            //This adds a single app idea to the list of ideas if the list is empty is empty
+//
+//            ideas.add(new Idea("Sample App",
+//
+//                    "This mobile app helps developers document " +
+//                    "their app ideas while also giving them the ability to write out the " +
+//                    "core functionalities of the app and also set //todo tasks.",
+//
+//                    "Display app ideas in list.\n\n" +
+//                            "App ideas could be added, modifies or deleted with ease.\n\n" +
+//                            "Images can be imported for individual ideas, this is useful " +
+//                            "especially in the case of multiple wireframes to be implemented, " +
+//                            "complex app logic sketches or even UML diagrams\n\n" +
+//                            "App allows you delete ideas that you have deemed unwanted.",
+//
+//                    "//Set up listview\n\n" +
+//                            "Set up search functionality on listview.\n\n" +
+//                            "Design app logo.\n\n" +
+//                            "Remember to change font size for textView",
+//
+//                    "Since inception",
+//                    null,
+//                    null));
+//
+//        }
 
-        if (!preferences.getString("Ideas", emptyArrayOfIdeas).equals(emptyArrayOfIdeas)) {
+        ideaRepository = new IdeaRepository(this);
+
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                ideas = ideaRepository.getAllIdeas();
+                setUpRecyclerView();
+                updateHeaderAppCount();
+            }
+        });
 
 
-            String json = preferences.getString("Ideas", emptyArrayOfIdeas);
-
-            Type type = new TypeToken<ArrayList<Idea>>(){}.getType();
-
-            ArrayList<Idea> ideasToBeLoaded = gson.fromJson(json, type);
-
-            Singleton.getInstance().loadIdeas(ideasToBeLoaded);
-
-            ideas = Singleton.getInstance().getIdea();
-
-        }else{
-
-            ideas = Singleton.getInstance().getIdea();
-
-            //This adds a single app idea to the list of ideas if the list is empty is empty
-
-            ideas.add(new Idea("Sample App",
-
-                    "This mobile app helps developers document " +
-                    "their app ideas while also giving them the ability to write out the " +
-                    "core functionalities of the app and also set //todo tasks.",
-
-                    "Display app ideas in list.\n\n" +
-                            "App ideas could be added, modifies or deleted with ease.\n\n" +
-                            "Images can be imported for individual ideas, this is useful " +
-                            "especially in the case of multiple wireframes to be implemented, " +
-                            "complex app logic sketches or even UML diagrams\n\n" +
-                            "App allows you delete ideas that you have deemed unwanted.",
-
-                    "//Set up listview\n\n" +
-                            "Set up search functionality on listview.\n\n" +
-                            "Design app logo.\n\n" +
-                            "Remember to change font size for textView",
-
-                    "Since inception",
-                    null,
-                    null));
-
-        }
 
     }
 
+    public void setUpRecyclerView(){
+
+        //RecyclerView custom IdeaAdapter is created with the ideas list
+        ideaAdapter = new IdeaAdapter(this, ideas, this, this);
+
+        //Adapter is attached to the recyclerView instance and preferred Layout is set
+        recyclerView.setAdapter(ideaAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
@@ -413,6 +461,8 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         }
     }
+
+
 
 
 

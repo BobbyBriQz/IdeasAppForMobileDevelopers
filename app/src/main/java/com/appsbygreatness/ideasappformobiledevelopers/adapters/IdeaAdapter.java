@@ -20,18 +20,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
     private Context context;
-    private ArrayList<Idea> ideas;
-    private ArrayList<Idea> filterList;
+    private List<Idea> ideas;
+    private List<Idea> filterList;
 
     private OnIdeaClickListener onIdeaClickListener;
     private OnLongIdeaClickListener onLongIdeaClickListener;
     private CustomFilter filter;
 
-    public IdeaAdapter(Context context, ArrayList<Idea> ideas, OnIdeaClickListener onIdeaClickListener, OnLongIdeaClickListener onLongIdeaClickListener) {
+    public IdeaAdapter(Context context, List<Idea> ideas, OnIdeaClickListener onIdeaClickListener, OnLongIdeaClickListener onLongIdeaClickListener) {
         this.context = context;
         this.ideas = ideas;
         this.filterList = ideas;
@@ -55,6 +56,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
 
         viewHolder.ideaName.setText(ideas.get(i).getName());
+        viewHolder.appIdea.setText(ideas.get(i).getIdea());
         viewHolder.ideaTimeStamp.setText(ideas.get(i).getTimestamp());
 
 
@@ -88,6 +90,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
        ImageView ideaPic;
        TextView ideaName;
+       TextView appIdea;
        TextView ideaTimeStamp;
        OnIdeaClickListener onIdeaClickListener;
        OnLongIdeaClickListener onLongIdeaClickListener;
@@ -98,6 +101,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
            ideaPic = itemView.findViewById(R.id.ideaPic);
            ideaName = itemView.findViewById(R.id.ideaNameTV);
+           appIdea = itemView.findViewById(R.id.appIdeaTV);
            ideaTimeStamp = itemView.findViewById(R.id.ideaTimestampTV);
            this.onIdeaClickListener = onIdeaClickListener;
            this.onLongIdeaClickListener = onLongIdeaClickListener;

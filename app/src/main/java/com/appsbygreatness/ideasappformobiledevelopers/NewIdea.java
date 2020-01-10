@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
+import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,6 +52,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     String imageName, fullPath = "/data/user/0/com.appsbygreatness.ideasappformobiledevelopers/app_Images";
 
     ArrayList<String> imageNames;
+    IdeaRepository ideaRepository;
 
     public static final int NEW_IDEAS_RESULTCODE = 11;
 
@@ -69,6 +71,8 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
             @Override
             public void onClick(View view) {
 
+                Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
+                startActivity(intent);
                 finish();
             }
         });
@@ -139,9 +143,18 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         Intent saveNewIdea = new Intent(getApplicationContext(), ViewIdeas.class);
         saveNewIdea.putExtra("position", 0);
 
-        ideas.add(new Idea(appName, appIdea, functionality, todo, timeStamp, fullPath, imageNames));
+//        ideas.add(new Idea(appName, appIdea, functionality, todo, timeStamp, fullPath, imageNames));
 
-        setResult(NEW_IDEAS_RESULTCODE, saveNewIdea);
+        Idea idea = new Idea(appName, appIdea, functionality, todo, timeStamp, fullPath, imageNames);
+
+        ideaRepository = new IdeaRepository(this);
+
+        ideaRepository.insertIdea(idea);
+
+
+        Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
+        startActivity(intent);
+
         finish();
 
     }
