@@ -9,7 +9,10 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.fragment.app.FragmentActivity;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -35,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
     BiometricPrompt biometricPrompt;
     BiometricPrompt.PromptInfo promptInfo;
 
+    Vibrator vibrator;
+
     public static final String TAG = "LoginActivity";
 
     @Override
@@ -45,6 +50,8 @@ public class LoginActivity extends AppCompatActivity {
         TextView helloText = findViewById(R.id.helloText);
         loginPassword = findViewById(R.id.passwordET);
         loginButton = findViewById(R.id.loginButton);
+
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
 
         preferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
@@ -88,6 +95,13 @@ public class LoginActivity extends AppCompatActivity {
 
                 }else{
 
+                    if(Build.VERSION.SDK_INT >= 26){
+
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    }else {
+
+                        vibrator.vibrate(200);
+                    }
                     Toast.makeText(getApplicationContext(), "Wrong password, please try again", Toast.LENGTH_SHORT).show();
                 }
 
