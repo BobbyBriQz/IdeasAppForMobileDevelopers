@@ -358,4 +358,9 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
         return imageIsDeleted;
     }
+
+    @Override
+    public void onBackPressed() {
+        killActivity();
+    }
 }

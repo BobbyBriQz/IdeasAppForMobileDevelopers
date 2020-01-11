@@ -2,15 +2,28 @@ package com.appsbygreatness.ideasappformobiledevelopers;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.fragment.app.FragmentActivity;
+
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.concurrent.Executor;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -18,6 +31,11 @@ public class LoginActivity extends AppCompatActivity {
     EditText loginPassword;
     Button loginButton;
     SharedPreferences preferences;
+    BiometricManager biometricManager;
+    BiometricPrompt biometricPrompt;
+    BiometricPrompt.PromptInfo promptInfo;
+
+    public static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
 
             });
 
-
         loginPassword.setTransformationMethod(new AsteriskPasswordTransformationMethod());
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -78,8 +95,51 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
+        setUpBiometricsLogin();
     }
+
+    public void setUpBiometricsLogin(){
+
+        biometricManager = BiometricManager.from(this);
+
+        checkBiometricStatus();
+        Executor executor = AppExecutors.getInstance().getMainThread();
+
+        biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                Toast.makeText(getApplicationContext(), "Authentication Error :" + errString,
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+
+                Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_SHORT)
+                        .show();
+                Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                Toast.makeText(getApplicationContext(), "Authentication failed",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login for Ideas app")
+                .setSubtitle("Login using your fingerprint")
+                .setDescription("Place your finger on fingerprint scanner")
+                .setNegativeButtonText("Use account password")
+                .build();
+    }
+
     public void onClick(View view){
 
         String password = loginPassword.getText().toString();
@@ -89,14 +149,17 @@ public class LoginActivity extends AppCompatActivity {
             if ((password.length() > 0)) {
 
                 String num = password.substring(0, password.length() - 1);
-
                 loginPassword.setText(num);
-
 
             }
             return;
         }
 
+        if(view.getTag().equals("fingerprint")){
+
+            biometricPrompt.authenticate(promptInfo);
+            return;
+        }
 
 
         String num =  view.getTag().toString();
@@ -104,6 +167,26 @@ public class LoginActivity extends AppCompatActivity {
         password += num;
 
         loginPassword.setText(password);
+    }
+
+    public void checkBiometricStatus(){
+
+        switch (biometricManager.canAuthenticate()){
+
+            case BiometricManager.BIOMETRIC_SUCCESS:
+                Log.i(TAG, "Biometric success");
+                break;
+
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                Log.i(TAG, "Phone does not support Biometrics Auth");
+                break;
+
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                Log.i(TAG, "No fingerprint found");
+
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                break;
+        }
     }
 
     public class AsteriskPasswordTransformationMethod extends PasswordTransformationMethod{
@@ -140,6 +223,5 @@ public class LoginActivity extends AppCompatActivity {
             return source.subSequence(i, i1);
         }
     }
-
 
 }
