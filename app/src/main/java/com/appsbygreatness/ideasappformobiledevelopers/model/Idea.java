@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.appsbygreatness.ideasappformobiledevelopers.ListConverter;
+import com.appsbygreatness.ideasappformobiledevelopers.TodoConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,8 @@ public class Idea {
 
     private String functionality;
 
-    private String todo;
+    @TypeConverters({TodoConverter.class})
+    private List<Todo> todo;
 
     private String timestamp;
 
@@ -34,7 +36,7 @@ public class Idea {
     @TypeConverters({ListConverter.class})
     private List<String> imageNames;
 
-    public Idea(int id, String name, String idea, String functionality, String todo, String timestamp,
+    public Idea(int id, String name, String idea, String functionality, List<Todo> todo, String timestamp,
                 String fullPath, List<String> imageNames) {
         this.id = id;
         this.name = name;
@@ -47,7 +49,6 @@ public class Idea {
         this.imageNames = new ArrayList<>();
 
 
-
         if(imageNames != null && imageNames.size() > 0){
 
             this.imageNames = imageNames;
@@ -56,7 +57,7 @@ public class Idea {
     }
 
 
-    public Idea(String name, String idea, String functionality, String todo, String timestamp,
+    public Idea(String name, String idea, String functionality, List<Todo> todo, String timestamp,
                 String fullpath, ArrayList<String> imageNames) {
         this.name = name;
         this.idea = idea;
@@ -117,11 +118,11 @@ public class Idea {
         this.functionality = functionality;
     }
 
-    public String getTodo() {
+    public List<Todo> getTodo() {
         return todo;
     }
 
-    public void setTodo(String todo) {
+    public void setTodo(List<Todo> todo) {
         this.todo = todo;
     }
 

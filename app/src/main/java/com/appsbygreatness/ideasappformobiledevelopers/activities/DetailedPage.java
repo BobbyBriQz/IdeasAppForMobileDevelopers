@@ -1,4 +1,4 @@
-package com.appsbygreatness.ideasappformobiledevelopers;
+package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -26,30 +26,34 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
+import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
+import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener{
+public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener,
+        TodoAdapter.OnTodoCompleteClickListener, TodoAdapter.OnTodoDeleteClickListener {
 
-    EditText detailedAppName, detailedAppIdea, detailedFunctionality, detailedTodo;
+    EditText detailedAppName, detailedAppIdea, detailedFunctionality, addTodoET;
     int id;
+    ImageButton addTodoButton;
     Idea idea;
-    RecyclerView detailedRV;
+    RecyclerView detailedRV, todoRV;
     BitmapAdapter adapter;
+    TodoAdapter todoAdapter;
     Bitmap bitmap;
     String imageName, fullPath;
     IdeaRepository ideaRepository;
@@ -76,16 +80,19 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         });
 
         detailedRV = findViewById(R.id.detailedRV);
+        todoRV = findViewById(R.id.todoRV);
 
         Intent intent = getIntent();
 
         id = intent.getIntExtra("id", 0);
 
 
+        addTodoButton = findViewById(R.id.addTodoButton);
+        addTodoET = findViewById(R.id.addTodoET);
         detailedAppName = findViewById(R.id.detailedAppName);
         detailedAppIdea = findViewById(R.id.detailedAppIdea);
         detailedFunctionality = findViewById(R.id.detailedFunctionality);
-        detailedTodo = findViewById(R.id.detailedTodo);
+
         ideaRepository = new IdeaRepository(this);
 
 
@@ -106,6 +113,16 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             }
         });
 
+        addTodoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                idea.getTodo().add(new Todo(addTodoET.getText().toString(), false));
+                addTodoET.setText("");
+                todoAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     private void killActivity() {
@@ -119,7 +136,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         detailedAppName.setText(idea.getName());
         detailedAppIdea.setText(idea.getIdea());
         detailedFunctionality.setText(idea.getFunctionality());
-        detailedTodo.setText(idea.getTodo());
+
 
     }
 
@@ -129,6 +146,12 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
         detailedRV.setAdapter(adapter);
         detailedRV.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) );
+
+        todoAdapter = new TodoAdapter(idea.getTodo(), this, this, this);
+
+        todoRV.setAdapter(todoAdapter);
+        todoRV.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
     }
 
     @Override
@@ -144,6 +167,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
 
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+//              Handle compression of bitmap here
 
                 SaveImageToInternalStorage saveObject = new SaveImageToInternalStorage();
                 fullPath = saveObject.execute(bitmap).get();
@@ -165,6 +189,22 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onCompleteClick(int position) {
+        boolean stateBeforeClick = idea.getTodo().get(position).isCompleted();
+        boolean stateAfterClick = !stateBeforeClick;
+        idea.getTodo().get(position).setCompleted(stateAfterClick);
+
+        todoAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+        idea.getTodo().remove(position);
+        todoAdapter.notifyDataSetChanged();
+
     }
 
     public class SaveImageToInternalStorage extends AsyncTask<Bitmap, Void, String> {
@@ -255,7 +295,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         idea.setName(detailedAppName.getText().toString());
         idea.setIdea(detailedAppIdea.getText().toString());
         idea.setFunctionality(detailedFunctionality.getText().toString());
-        idea.setTodo(detailedTodo.getText().toString());
+        //idea.setTodo(detailedTodo.getText().toString());
         idea.setTimestamp(timeStamp);
 
         AppExecutors.getInstance().getDiskIO().execute(new Runnable() {

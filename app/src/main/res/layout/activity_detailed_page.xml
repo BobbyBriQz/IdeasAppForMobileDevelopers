@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".DetailedPage">
+    tools:context=".activities.DetailedPage">
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -29,23 +29,30 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-            <EditText
-                android:id="@+id/detailedAppName"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:hint="Enter the app name"
-                android:inputType="textCapWords"
-                android:minHeight="40dp"
-                android:layout_marginHorizontal="10dp"
-                android:padding="10dp" />
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/detailedAppName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffffff"
+                    android:hint="App name"
+                    android:inputType="textCapWords"
+                    android:minHeight="40dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:padding="10dp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/detailedRV"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                tools:listitem="@layout/card_image_rv">
 
             </androidx.recyclerview.widget.RecyclerView>
 
@@ -95,6 +102,7 @@
                 android:padding="10dp"
                 android:textSize="14sp" />
 
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,22 +112,62 @@
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/detailedTodo"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/todoRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/transparent"
+                    android:orientation="vertical"
+                    tools:listitem="@layout/todo_card_layout" />
+            </RelativeLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/edit_text_bg"
-                android:gravity="top|left"
-                android:hint="//TODO"
-                android:inputType="textCapSentences|textMultiLine|textLongMessage"
-                android:minHeight="100dp"
-                android:padding="10dp"
-                android:textSize="14sp" />
+                android:orientation="horizontal"
+                >
 
+                <EditText
+                    android:id="@+id/addTodoET"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/addTodoButton"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="Add new task to do"
+                    android:background="@drawable/login_button_bg"
+                    />
+
+
+                <ImageButton
+                    android:id="@+id/addTodoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_add"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
+
+
     </ScrollView>
 
 

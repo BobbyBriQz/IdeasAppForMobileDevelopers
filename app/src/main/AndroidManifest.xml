@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,11 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".ViewIdeas" />
-        <activity android:name=".DetailedPage" />
-        <activity android:name=".NewIdea" />
-        <activity android:name=".ViewBitmaps" />
+        <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.ViewIdeas" />
+        <activity android:name=".activities.DetailedPage" />
+        <activity android:name=".activities.NewIdea" />
+        <activity android:name=".activities.ViewBitmaps" />
     </application>
 
 </manifest>

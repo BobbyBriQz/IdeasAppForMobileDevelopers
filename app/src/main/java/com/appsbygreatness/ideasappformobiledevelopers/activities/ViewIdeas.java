@@ -1,9 +1,10 @@
-package com.appsbygreatness.ideasappformobiledevelopers;
+package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.IdeaAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.fragments.AboutDeveloperDialogFragment;
@@ -18,6 +19,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,12 +35,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaClickListener,
@@ -51,6 +53,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     TextView drawerUsername, drawerAppCount;
+    CircleImageView circleImageView;
     View headerView;
     NavigationView navigationView;
     IdeaRepository ideaRepository;
@@ -107,9 +110,24 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         drawerUsername = headerView.findViewById(R.id.drawerUserName);
         drawerUsername.setText(preferences.getString("Username", ""));
+        /*circleImageView = findViewById(R.id.circularIV);
+        circleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO: Image import code goes here
+            }
+        });*/
+
+        //circleImageView.setImageBitmap(getBitmapFromPreferences());
 
 
 
+
+    }
+
+    private Bitmap getBitmapFromPreferences() {
+        //TODO: retrieve image from preferences
+        return null;
     }
 
     public void updateHeaderAppCount(){
@@ -333,52 +351,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     public void setupPreferences() {
 
         preferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-//        ArrayList<Idea> emptyArray = new ArrayList<>();
-//        Gson gson = new Gson();
-//        String emptyArrayOfIdeas = gson.toJson(emptyArray);
-//
-//        if (!preferences.getString("Ideas", emptyArrayOfIdeas).equals(emptyArrayOfIdeas)) {
-//
-//
-//            String json = preferences.getString("Ideas", emptyArrayOfIdeas);
-//
-//            Type type = new TypeToken<ArrayList<Idea>>(){}.getType();
-//
-//            ArrayList<Idea> ideasToBeLoaded = gson.fromJson(json, type);
-//
-//            Singleton.getInstance().loadIdeas(ideasToBeLoaded);
-//
-//            ideas = Singleton.getInstance().getIdea();
-//
-//        }else{
-//
-//            ideas = Singleton.getInstance().getIdea();
-//
-//            //This adds a single app idea to the list of ideas if the list is empty is empty
-//
-//            ideas.add(new Idea("Sample App",
-//
-//                    "This mobile app helps developers document " +
-//                    "their app ideas while also giving them the ability to write out the " +
-//                    "core functionalities of the app and also set //todo tasks.",
-//
-//                    "Display app ideas in list.\n\n" +
-//                            "App ideas could be added, modifies or deleted with ease.\n\n" +
-//                            "Images can be imported for individual ideas, this is useful " +
-//                            "especially in the case of multiple wireframes to be implemented, " +
-//                            "complex app logic sketches or even UML diagrams\n\n" +
-//                            "App allows you delete ideas that you have deemed unwanted.",
-//
-//                    "//Set up listview\n\n" +
-//                            "Set up search functionality on listview.\n\n" +
-//                            "Design app logo.\n\n" +
-//                            "Remember to change font size for textView",
-//
-//                    "Since inception",
-//                    null,
-//                    null));
-//
-//        }
 
         ideaRepository = new IdeaRepository(this);
 

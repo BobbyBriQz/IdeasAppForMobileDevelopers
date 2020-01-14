@@ -1,4 +1,4 @@
-package com.appsbygreatness.ideasappformobiledevelopers;
+package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;

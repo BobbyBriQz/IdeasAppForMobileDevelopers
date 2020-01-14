@@ -1,4 +1,4 @@
-package com.appsbygreatness.ideasappformobiledevelopers;
+package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.appsbygreatness.ideasappformobiledevelopers.R;
 
 public class RegisterActivity extends AppCompatActivity {
 

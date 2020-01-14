@@ -1,4 +1,4 @@
-package com.appsbygreatness.ideasappformobiledevelopers;
+package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -24,10 +24,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
+import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
+import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
 import java.io.File;
@@ -36,22 +40,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
-public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener {
+public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener,
+        TodoAdapter.OnTodoDeleteClickListener, TodoAdapter.OnTodoCompleteClickListener {
 
 
 
-    EditText newAppName, newAppIdea, newFunctionality, newTodo;
+    EditText newAppName, newAppIdea, newFunctionality, newAddTodoET;
 
-    ArrayList<Idea> ideas;
     Bitmap bitmap;
-
     BitmapAdapter adapter;
+    TodoAdapter todoAdapter;
+    RecyclerView newTodoRV;
+    ImageButton newAddTodoButton;
 
     String imageName, fullPath = "/data/user/0/com.appsbygreatness.ideasappformobiledevelopers/app_Images";
-
     ArrayList<String> imageNames;
+    List<Todo> todos;
     IdeaRepository ideaRepository;
 
     public static final int NEW_IDEAS_RESULTCODE = 11;
@@ -71,31 +78,44 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
-                startActivity(intent);
-                finish();
+                deleteImagesFromDeviceStorage(fullPath, imageNames);
+                killActivity();
             }
         });
 
         newAppName = findViewById(R.id.newAppName);
         newAppIdea = findViewById(R.id.newAppIdea);
         newFunctionality = findViewById(R.id.newFunctionality);
-        newTodo = findViewById(R.id.newTodo);
+        newAddTodoButton = findViewById(R.id.newAddTodoButton);
+        newAddTodoET = findViewById(R.id.newAddTodoET);
+
 
         RecyclerView newRV = findViewById(R.id.newRV);
+        newTodoRV = findViewById(R.id.newTodoRV);
 
-        ideas = Singleton.getInstance().getIdea();
 
-        //bitmaps = new ArrayList<>();
-//        fullPaths = new ArrayList<>();
         imageNames = new ArrayList<>();
+        todos = new ArrayList<>();
+
+
 
         adapter = new BitmapAdapter(fullPath, imageNames,this, this, this);
+        todoAdapter = new TodoAdapter(todos, this, this, this);
 
         newRV.setAdapter(adapter);
         newRV.setLayoutManager(new LinearLayoutManager( this, LinearLayoutManager.HORIZONTAL, false));
 
+        newTodoRV.setAdapter(todoAdapter);
+        newTodoRV.setLayoutManager(new LinearLayoutManager( this, LinearLayoutManager.VERTICAL, false));
 
+        newAddTodoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                todos.add(new Todo(newAddTodoET.getText().toString(), false));
+                newAddTodoET.setText("");
+                todoAdapter.notifyDataSetChanged();
+            }
+        });
 
     }
 
@@ -135,7 +155,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         String appName = newAppName.getText().toString();
         String appIdea = newAppIdea.getText().toString();
         String functionality = newFunctionality.getText().toString();
-        String todo = newTodo.getText().toString();
 
         Date date = Calendar.getInstance().getTime();
         String timeStamp = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date);
@@ -143,20 +162,21 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         Intent saveNewIdea = new Intent(getApplicationContext(), ViewIdeas.class);
         saveNewIdea.putExtra("position", 0);
 
-//        ideas.add(new Idea(appName, appIdea, functionality, todo, timeStamp, fullPath, imageNames));
-
-        Idea idea = new Idea(appName, appIdea, functionality, todo, timeStamp, fullPath, imageNames);
+        Idea idea = new Idea(appName, appIdea, functionality, todos, timeStamp, fullPath, imageNames);
 
         ideaRepository = new IdeaRepository(this);
 
         ideaRepository.insertIdea(idea);
 
+        killActivity();
 
+    }
+
+    private void killActivity() {
         Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
         startActivity(intent);
 
         finish();
-
     }
 
     public void importImage(){
@@ -188,17 +208,12 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
             try {
 
-
-
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
 
                 SaveToInternalStorage saveObject = new SaveToInternalStorage();
                 fullPath = saveObject.execute(bitmap).get();
 
-
                 adapter.notifyDataSetChanged();
-
-
 
 
             } catch (Exception e) {
@@ -212,6 +227,12 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     @Override
     public void onBitmapClick(int position) {
 
+        Intent intent = new Intent(getApplicationContext(), ViewBitmaps.class);
+
+        intent.putExtra("Image path", fullPath);
+        intent.putExtra("Image name", imageNames.get(position));
+
+        startActivity(intent);
     }
 
     @Override
@@ -238,8 +259,23 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
     }
 
-    public class SaveToInternalStorage extends AsyncTask<Bitmap, Void, String> {
+    @Override
+    public void onCompleteClick(int position) {
+        boolean stateBeforeClick = todos.get(position).isCompleted();
+        boolean stateAfterClick = !stateBeforeClick;
+        todos.get(position).setCompleted(stateAfterClick);
 
+        todoAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+        todos.remove(position);
+        todoAdapter.notifyDataSetChanged();
+    }
+
+
+    public class SaveToInternalStorage extends AsyncTask<Bitmap, Void, String> {
 
         @Override
         protected String doInBackground(Bitmap... bitmaps) {
@@ -264,9 +300,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
             try {
                 fileOutputStream = new FileOutputStream(mypath);
 
-
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-
 
                 fileOutputStream.close();
                 Log.i("NewIdea", "Save: Successful");
@@ -279,10 +313,28 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
                 Log.i("NewIdea", "Save to internal storage: failed ");
             }
 
-
             return null;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        deleteImagesFromDeviceStorage(fullPath, imageNames);
+        killActivity();
+    }
+
+    private void deleteImagesFromDeviceStorage(String imagePath, List<String> imageNames) {
+
+        for(String imageName : imageNames){
+            File f = new File(imagePath, imageName);
+
+            try {
+                f.delete();
 
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
