@@ -15,7 +15,7 @@
         android:id="@+id/circularIV"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/bobby"
+        android:src="@drawable/display_picture"
 
         app:civ_border_width="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

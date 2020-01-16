@@ -1,74 +1,67 @@
 package com.appsbygreatness.ideasappformobiledevelopers.repository;
 
 import android.content.Context;
-import android.os.AsyncTask;
-
 import androidx.room.Room;
 
-import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
+import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
+import com.appsbygreatness.ideasappformobiledevelopers.dao.IdeaDao;
 import com.appsbygreatness.ideasappformobiledevelopers.database.IdeaDatabase;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class IdeaRepository {
 
-    private String DB_NAME = "idea_database.db";
-
-    private IdeaDatabase ideaDatabase;
+    private IdeaDao ideaDao;
 
     public IdeaRepository(Context context){
 
-        ideaDatabase = Room.databaseBuilder(context, IdeaDatabase.class, DB_NAME).build();
+        IdeaDatabase ideaDatabase = IdeaDatabase.getDatabase(context);
+        ideaDao = ideaDatabase.ideaDao();
     }
 
     public void insertIdea(final Idea idea){
 
-        new AsyncTask<Void, Void, Void>(){
-
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
-
-                ideaDatabase.ideaDao().insertIdea(idea);
-                return null;
+            public void run() {
+                ideaDao.insertIdea(idea);
             }
-        }.execute();
+        });
+
+
     }
 
     public void updateIdea(final Idea idea){
 
-        new AsyncTask<Void, Void, Void>(){
-
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
-
-                ideaDatabase.ideaDao().updateIdea(idea);
-                return null;
+            public void run() {
+                ideaDao.updateIdea(idea);
             }
-        }.execute();
+        });
+
+
     }
 
     public void deleteIdea(final Idea idea){
 
-        ideaDatabase.ideaDao().deleteIdea(idea);
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                ideaDao.deleteIdea(idea);
+            }
+        });
     }
-
-    public void deleteIdea(final int id){
-
-        ideaDatabase.ideaDao().deleteIdea(id);
-    }
-
 
 
     public Idea getIdea(final int id){
 
-        return ideaDatabase.ideaDao().getIdea(id);
+        return ideaDao.getIdea(id);
     }
 
     public List<Idea> getAllIdeas(){
 
-        return ideaDatabase.ideaDao().getAllIdeas();
+        return ideaDao.getAllIdeas();
     }
 
 

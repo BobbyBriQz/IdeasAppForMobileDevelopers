@@ -6,12 +6,16 @@ import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.MediaStore;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +23,8 @@ import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +33,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
@@ -34,14 +41,20 @@ import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static com.appsbygreatness.ideasappformobiledevelopers.activities.DetailedPage.IMPORT_IMAGE_REQUESTCODE;
 
 public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener,
         TodoAdapter.OnTodoDeleteClickListener, TodoAdapter.OnTodoCompleteClickListener {
@@ -159,9 +172,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         Date date = Calendar.getInstance().getTime();
         String timeStamp = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date);
 
-        Intent saveNewIdea = new Intent(getApplicationContext(), ViewIdeas.class);
-        saveNewIdea.putExtra("position", 0);
-
         Idea idea = new Idea(appName, appIdea, functionality, todos, timeStamp, fullPath, imageNames);
 
         ideaRepository = new IdeaRepository(this);
@@ -185,11 +195,11 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, DetailedPage.IMPORT_IMAGE_REQUESTCODE );
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUESTCODE );
             }else{
 
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, DetailedPage.IMPORT_IMAGE_REQUESTCODE);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
 
             }
         }
@@ -199,16 +209,32 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == IMPORT_IMAGE_REQUESTCODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+            }
+        }
+
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == DetailedPage.IMPORT_IMAGE_REQUESTCODE && data != null){
+        if (requestCode == IMPORT_IMAGE_REQUESTCODE && data != null){
 
             Uri selectedImage = data.getData();
 
             try {
 
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                //bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                bitmap = scaleImageFromUri(this,selectedImage);
 
                 SaveToInternalStorage saveObject = new SaveToInternalStorage();
                 fullPath = saveObject.execute(bitmap).get();
@@ -305,6 +331,8 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
                 fileOutputStream.close();
                 Log.i("NewIdea", "Save: Successful");
 
+                //resizeBitmapInFile(mypath);
+
                 return directory.getAbsolutePath();
 
 
@@ -316,6 +344,115 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
             return null;
         }
     }
+
+    public Bitmap scaleImageFromUri(Context context, Uri photoUri) throws IOException {
+
+        InputStream is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options dbo = new BitmapFactory.Options();
+        dbo.inJustDecodeBounds = true;
+        dbo.inSampleSize = 6;
+        BitmapFactory.decodeStream(is, null, dbo);
+        assert is != null;
+        is.close();
+
+        int orientation = getOrientation(context, photoUri);
+
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 160;
+
+        // Find the correct scale value. It should be the power of 2.
+        int scale = 1;
+        while (dbo.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                dbo.outHeight / scale / 2 >= REQUIRED_SIZE) {
+            scale *= 2;
+        }
+
+
+
+        Bitmap srcBitmap;
+        is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = scale;
+        srcBitmap = BitmapFactory.decodeStream(is, null, options);
+        assert is != null;
+        is.close();
+
+        /*
+         * if the orientation is not 0 (or -1, which means we don't know), we
+         * have to do a rotation.
+         */
+        if (orientation > 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+
+            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                    srcBitmap.getHeight(), matrix, true);
+        }
+
+
+        return srcBitmap;
+    }
+
+
+    public static int getOrientation(Context context, Uri photoUri) {
+        /* it's on the external media. */
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+        assert cursor != null;
+        if (cursor.getCount() != 1) {
+            return -1;
+        }
+
+        cursor.moveToFirst();
+        int orientation = cursor.getInt(0);
+        cursor.close();
+        return orientation;
+    }
+
+
+    /*public void resizeBitmapInFile(File file) {
+        try {
+
+            // BitmapFactory options to downsize the image
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            o.inSampleSize = 6;
+            // factor of downsizing the image
+
+            FileInputStream inputStream = new FileInputStream(file);
+            //Bitmap selectedBitmap = null;
+            BitmapFactory.decodeStream(inputStream, null, o);
+            inputStream.close();
+
+            // The new size we want to scale to
+            final int REQUIRED_SIZE = 75;
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+                scale *= 2;
+            }
+
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            inputStream = new FileInputStream(file);
+
+            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2);
+            inputStream.close();
+
+            // here i override the original image file
+            //file.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(file);
+            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , outputStream);
+
+
+        } catch (Exception e) {
+
+        }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -330,7 +467,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
             try {
                 f.delete();
-
 
             } catch (Exception e) {
                 e.printStackTrace();

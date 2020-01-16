@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appsbygreatness.ideasappformobiledevelopers.R;
-import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
+import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 
 import java.util.concurrent.Executor;
 

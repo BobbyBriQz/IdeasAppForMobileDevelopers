@@ -1,12 +1,15 @@
 package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.IdeaAdapter;
-import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.fragments.AboutDeveloperDialogFragment;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
@@ -20,12 +23,20 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +48,16 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -45,6 +65,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaClickListener,
         IdeaAdapter.OnLongIdeaClickListener, NavigationView.OnNavigationItemSelectedListener {
 
+    public static final String DISPLAY_PICTURE_KEY = "Display picture";
     //List of fields with global scope that will be used within class two or more class methods
     private List<Idea> ideas;
     private static IdeaAdapter ideaAdapter;
@@ -54,9 +75,11 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     private ActionBarDrawerToggle drawerToggle;
     TextView drawerUsername, drawerAppCount;
     CircleImageView circleImageView;
+    private String displayPicturePath;
     View headerView;
     NavigationView navigationView;
     IdeaRepository ideaRepository;
+    public static final int IMPORT_IMAGE_REQUESTCODE = 998;
 
     private static final String TAG = "ViewIdeas";
 
@@ -110,15 +133,22 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         drawerUsername = headerView.findViewById(R.id.drawerUserName);
         drawerUsername.setText(preferences.getString("Username", ""));
-        /*circleImageView = findViewById(R.id.circularIV);
+
+        circleImageView = headerView.findViewById(R.id.circularIV);
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //TODO: Image import code goes here
-            }
-        });*/
+                //Toast.makeText(getApplicationContext(),"call importImage();", Toast.LENGTH_SHORT ).show();
 
-        //circleImageView.setImageBitmap(getBitmapFromPreferences());
+                importImage();
+            }
+        });
+
+        if (preferences.getString(DISPLAY_PICTURE_KEY, "") != ""){
+            circleImageView.setImageBitmap(getBitmapFromPreferences());
+        }
+
 
 
 
@@ -127,7 +157,173 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     private Bitmap getBitmapFromPreferences() {
         //TODO: retrieve image from preferences
-        return null;
+        String displayPicture = preferences.getString(DISPLAY_PICTURE_KEY,"");
+        File f = new File(displayPicture);
+
+        Bitmap bitmap = null;
+        try {
+            bitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    public void importImage(){
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUESTCODE );
+            }else{
+
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+
+            }
+        }
+
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == IMPORT_IMAGE_REQUESTCODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+            }
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == IMPORT_IMAGE_REQUESTCODE && data != null){
+
+            Uri selectedImage = data.getData();
+            Bitmap bitmap;
+
+            try {
+
+                //Reduce size of bitmap
+                bitmap = scaleImageFromUri(this,selectedImage);
+
+                //Save selected image to Local Storage
+                SaveToInternalStorage saveObject = new SaveToInternalStorage();
+                displayPicturePath = saveObject.execute(bitmap).get();
+
+                //Check to see if display picture has been selected before
+                if (!preferences.getString(DISPLAY_PICTURE_KEY, "").equals("")){
+
+                    String oldDisplayPicturePath = preferences.getString(DISPLAY_PICTURE_KEY, "");
+
+                    deleteOldDPFromStorage(oldDisplayPicturePath);
+                }
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(DISPLAY_PICTURE_KEY, displayPicturePath);
+                editor.apply();
+
+                circleImageView.setImageBitmap(bitmap);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    private void deleteOldDPFromStorage(String oldDisplayPicturePath) {
+        File f = new File(oldDisplayPicturePath);
+
+        try{
+            boolean deleteStatus = f.delete();
+
+            if(deleteStatus){
+                Toast.makeText(getApplicationContext(), "Display picture changed!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }catch (Exception e){
+            Log.i("DisplayPic delete error", e.getMessage());
+        }
+    }
+
+    public Bitmap scaleImageFromUri(Context context, Uri photoUri) throws IOException {
+
+        InputStream is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options dbo = new BitmapFactory.Options();
+        dbo.inJustDecodeBounds = true;
+        dbo.inSampleSize = 6;
+        BitmapFactory.decodeStream(is, null, dbo);
+        assert is != null;
+        is.close();
+
+        int orientation = getOrientation(context, photoUri);
+
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 40;
+
+        // Find the correct scale value. It should be the power of 2.
+        int scale = 1;
+        while (dbo.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                dbo.outHeight / scale / 2 >= REQUIRED_SIZE) {
+            scale *= 2;
+        }
+
+
+
+        Bitmap srcBitmap;
+        is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = scale;
+        srcBitmap = BitmapFactory.decodeStream(is, null, options);
+        assert is != null;
+        is.close();
+
+        /*
+         * if the orientation is not 0 (or -1, which means we don't know), we
+         * have to do a rotation.
+         */
+        if (orientation > 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+
+            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                    srcBitmap.getHeight(), matrix, true);
+        }
+
+
+        return srcBitmap;
+    }
+
+    public static int getOrientation(Context context, Uri photoUri) {
+        /* it's on the external media. */
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+        assert cursor != null;
+        if (cursor.getCount() != 1) {
+            return -1;
+        }
+
+        cursor.moveToFirst();
+        int orientation = cursor.getInt(0);
+        cursor.close();
+        return orientation;
     }
 
     public void updateHeaderAppCount(){
@@ -136,8 +332,8 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         drawerAppCount.setText(new StringBuilder().append("Currently working on ").append(ideas.size()).append(" apps."));
     }
 
-    //Method that is called on return to onCreate from a previously visited activity
-    //Pretty much just notifies the recyclerView's Adapter about a possible in the change in dataset
+    /*//Method that is called on return to onCreate from a previously visited activity
+    //Pretty much just notifies the recyclerView's Adapter about a possible change in dataset
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -153,7 +349,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         }
 
 
-    }
+    }*/
 
 
 
@@ -245,7 +441,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         super.onDestroy();
 
         //Persist data to data-store
-        savePreferences();
+//        savePreferences();
     }
 
 
@@ -304,14 +500,10 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         }
 
 
-        if (item.getItemId() == R.id.saveApp){
+        if (item.getItemId() == R.id.exitApp){
 
-            savePreferences();
-
-        }else if (item.getItemId() == R.id.exitApp){
-
-            savePreferences();
-
+//            savePreferences();
+            logout();
             Intent exit = new Intent(Intent.ACTION_MAIN);
             exit.addCategory(Intent.CATEGORY_HOME);
             exit.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -329,7 +521,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     public void logout(){
 
-        savePreferences();
+//        savePreferences();
 
         Intent logout = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(logout);
@@ -338,13 +530,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     }
 
-    public void savePreferences(){
-
-        SaveInBackground saveInBackground = new SaveInBackground();
-
-        saveInBackground.start();
-
-    }
 
 
     //Links to data-store to retrieve persisted data, called in onCreate
@@ -414,23 +599,48 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     }
 
-    //persists data to a background thread
-    public class SaveInBackground extends Thread{
+    public class SaveToInternalStorage extends AsyncTask<Bitmap, Void, String> {
 
+        String imageName;
         @Override
-        public void run() {
-            super.run();
+        protected String doInBackground(Bitmap... bitmaps) {
+            Bitmap bitmap = bitmaps[0];
 
-            SharedPreferences.Editor editor = preferences.edit();
+            Date date = Calendar.getInstance().getTime();
+            imageName = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date) + "jpg";
 
-            Gson gson = new Gson();
 
-            String json = gson.toJson(ideas);
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
-            editor.putString("Ideas", json).apply();
+            File directory = cw.getDir("Images", Context.MODE_PRIVATE);
 
-            Log.i(TAG, json);
 
+            File mypath = new File(directory, (imageName));
+
+            String imagePath = mypath.getAbsolutePath();
+
+            FileOutputStream fileOutputStream = null;
+            Log.i("NewIdea", "About to commence save");
+
+            try {
+                fileOutputStream = new FileOutputStream(mypath);
+
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+
+                fileOutputStream.close();
+                Log.i("NewIdea", "Save: Successful");
+
+
+
+                return imagePath;
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("NewIdea", "Save to internal storage: failed ");
+            }
+
+            return null;
         }
     }
 

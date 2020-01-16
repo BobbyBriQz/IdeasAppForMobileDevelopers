@@ -16,7 +16,6 @@ import com.appsbygreatness.ideasappformobiledevelopers.R;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder> {
@@ -69,6 +68,7 @@ public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder
             Bitmap bitmap = null;
             try {
                 bitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

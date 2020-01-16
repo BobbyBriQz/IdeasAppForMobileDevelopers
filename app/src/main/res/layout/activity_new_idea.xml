@@ -138,18 +138,18 @@
                     android:id="@+id/newAddTodoET"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/login_button_bg"
+                    android:hint="Add a new task to do"
+                    android:inputType="textCapSentences"
                     android:paddingStart="10dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/newAddTodoButton"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:hint="Add a new task to do"
-                    android:background="@drawable/login_button_bg"
-                    />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
                 <ImageButton

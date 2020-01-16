@@ -8,14 +8,10 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.appsbygreatness.ideasappformobiledevelopers.R;
-import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
-import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
-import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 
 public class ViewBitmaps extends AppCompatActivity {
 
@@ -43,9 +39,9 @@ public class ViewBitmaps extends AppCompatActivity {
 
     }
 
-    private void setImage(String imagePath, String imageName) {
+    private void setImage(String imageDir, String imageName) {
 
-            File f = new File(imagePath, imageName);
+            File f = new File(imageDir, imageName);
 
             Bitmap bitmap = null;
             try {

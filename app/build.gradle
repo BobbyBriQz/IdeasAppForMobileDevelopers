@@ -38,5 +38,6 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
+
     implementation 'androidx.biometric:biometric:1.0.1'
 }

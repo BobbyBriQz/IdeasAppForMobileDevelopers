@@ -1,4 +1,4 @@
-package com.appsbygreatness.ideasappformobiledevelopers.database;
+package com.appsbygreatness.ideasappformobiledevelopers;
 
 
 import android.os.Looper;

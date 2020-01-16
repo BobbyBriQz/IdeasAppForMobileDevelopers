@@ -1,12 +1,16 @@
 package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -21,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,13 +37,17 @@ import android.widget.Toast;
 import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
-import com.appsbygreatness.ideasappformobiledevelopers.database.AppExecutors;
+import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
@@ -164,9 +173,8 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
             try {
 
-
-
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                //bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                bitmap = scaleImageFromUri(this, selectedImage);
 //              Handle compression of bitmap here
 
                 SaveImageToInternalStorage saveObject = new SaveImageToInternalStorage();
@@ -191,6 +199,170 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public class SaveImageToInternalStorage extends AsyncTask<Bitmap, Void, String> {
+
+
+        @Override
+        protected String doInBackground(Bitmap... bitmaps) {
+            Bitmap bitmap = bitmaps[0];
+
+            Date date = Calendar.getInstance().getTime();
+            imageName = new SimpleDateFormat("dd-MM-YYYY,HH:mm:ssa", Locale.getDefault()).format(date) + ".jpg";
+
+            idea.addImageName(imageName);
+
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+
+            //Get the directory path for Images in private mode (Inside app data)
+            File directory = cw.getDir("Images", Context.MODE_PRIVATE);
+
+
+            //Get the file path to which the bitmap is to be saved
+            File mypath = new File(directory, (imageName));
+
+
+
+
+            //FileOutStream to be used for the parsing of the bitmap to the myPath location
+            FileOutputStream fileOutputStream;
+            Log.i("DetailedPage", "About to commence save");
+
+            try {
+                fileOutputStream = new FileOutputStream(mypath);
+
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+
+                fileOutputStream.close();
+                Log.i("DetailedPage", "Save: Successful");
+
+                //This is where that saveBitmapToFile() should be called.
+
+                //resizeBitmapInFile(mypath);
+
+                return directory.getAbsolutePath();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("DetailedPage", "Save to internal storage: failed ");
+            }
+
+
+            return null;
+        }
+
+
+
+    }
+
+    public Bitmap scaleImageFromUri(Context context, Uri photoUri) throws IOException {
+
+        InputStream is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options dbo = new BitmapFactory.Options();
+        dbo.inJustDecodeBounds = true;
+        dbo.inSampleSize = 6;
+        BitmapFactory.decodeStream(is, null, dbo);
+        assert is != null;
+        is.close();
+
+        int orientation = getOrientation(context, photoUri);
+
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 160;
+
+        // Find the correct scale value. It should be the power of 2.
+        int scale = 1;
+        while (dbo.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                dbo.outHeight / scale / 2 >= REQUIRED_SIZE) {
+            scale *= 2;
+        }
+
+
+
+        Bitmap srcBitmap;
+        is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = scale;
+        srcBitmap = BitmapFactory.decodeStream(is, null, options);
+        assert is != null;
+        is.close();
+
+        /*
+         * if the orientation is not 0 (or -1, which means we don't know), we
+         * have to do a rotation.
+         */
+        if (orientation > 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+
+            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                    srcBitmap.getHeight(), matrix, true);
+        }
+
+
+        return srcBitmap;
+    }
+
+
+    public static int getOrientation(Context context, Uri photoUri) {
+        /* it's on the external media. */
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+        assert cursor != null;
+        if (cursor.getCount() != 1) {
+            return -1;
+        }
+
+        cursor.moveToFirst();
+        int orientation = cursor.getInt(0);
+        cursor.close();
+        return orientation;
+    }
+
+
+    /*public void resizeBitmapInFile(File file) {
+        try {
+
+            // BitmapFactory options to downsize the image
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            o.inSampleSize = 6;
+            // factor of downsizing the image
+
+            FileInputStream inputStream = new FileInputStream(file);
+            //Bitmap selectedBitmap = null;
+            BitmapFactory.decodeStream(inputStream, null, o);
+            inputStream.close();
+
+            // The new size we want to scale to
+            final int REQUIRED_SIZE = 75;
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+                scale *= 2;
+            }
+
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            inputStream = new FileInputStream(file);
+
+            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2);
+            inputStream.close();
+
+            // here i override the original image file
+            //file.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(file);
+            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , outputStream);
+
+
+        } catch (Exception e) {
+
+        }
+    }*/
     @Override
     public void onCompleteClick(int position) {
         boolean stateBeforeClick = idea.getTodo().get(position).isCompleted();
@@ -207,50 +379,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
     }
 
-    public class SaveImageToInternalStorage extends AsyncTask<Bitmap, Void, String> {
 
-
-        @Override
-        protected String doInBackground(Bitmap... bitmaps) {
-            Bitmap bitmap = bitmaps[0];
-
-            Date date = Calendar.getInstance().getTime();
-            imageName = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date) + "jpg";
-
-            idea.addImageName(imageName);
-
-            ContextWrapper cw = new ContextWrapper(getApplicationContext());
-
-            File directory = cw.getDir("Images", Context.MODE_PRIVATE);
-
-            File mypath = new File(directory, (imageName));
-
-            FileOutputStream fileOutputStream;
-            Log.i("DetailedPage", "About to commence save");
-
-            try {
-                fileOutputStream = new FileOutputStream(mypath);
-
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-
-                fileOutputStream.close();
-                Log.i("DetailedPage", "Save: Successful");
-                //loadBitmapToImageView(directory.getAbsolutePath());
-
-                return directory.getAbsolutePath();
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.i("DetailedPage", "Save to internal storage: failed ");
-            }
-
-
-            return null;
-        }
-
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -298,13 +427,9 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         //idea.setTodo(detailedTodo.getText().toString());
         idea.setTimestamp(timeStamp);
 
-        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                ideaRepository.updateIdea(idea);
-                killActivity();
-            }
-        });
+        ideaRepository.updateIdea(idea);
+        killActivity();
+
 
 
     }
