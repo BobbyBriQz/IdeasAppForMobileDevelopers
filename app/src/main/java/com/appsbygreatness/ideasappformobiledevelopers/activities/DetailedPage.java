@@ -1,7 +1,6 @@
 package com.appsbygreatness.ideasappformobiledevelopers.activities;
 
 import android.Manifest;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
@@ -25,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,9 +40,7 @@ import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +63,6 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     String imageName, fullPath;
     IdeaRepository ideaRepository;
 
-    public static final int DETAILED_PAGE_RESULTCODE = 12;
     public static final int IMPORT_IMAGE_REQUESTCODE = 111;
 
     @Override
@@ -125,6 +120,14 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         addTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String todo = addTodoET.getText().toString();
+
+                if(todo.trim().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Please input task to do", Toast.LENGTH_SHORT)
+                            .show();
+
+                    return;
+                }
 
                 idea.getTodo().add(new Todo(addTodoET.getText().toString(), false));
                 addTodoET.setText("");
@@ -296,6 +299,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             Matrix matrix = new Matrix();
             matrix.postRotate(orientation);
 
+            assert srcBitmap != null;
             srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
                     srcBitmap.getHeight(), matrix, true);
         }

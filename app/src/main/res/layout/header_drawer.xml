@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="144dp"
@@ -7,7 +8,8 @@
     android:orientation="vertical"
     android:gravity="bottom"
     android:paddingBottom="10dp"
-    android:paddingHorizontal="10dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
     android:background="#EBC6A6">
 
 

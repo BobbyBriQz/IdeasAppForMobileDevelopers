@@ -45,8 +45,6 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -66,22 +64,21 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         IdeaAdapter.OnLongIdeaClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     public static final String DISPLAY_PICTURE_KEY = "Display picture";
-    //List of fields with global scope that will be used within class two or more class methods
+    private static final String TAG = "ViewIdeas";
+
+    //List of fields with global scope that will be used within two or more class methods
     private List<Idea> ideas;
-    private static IdeaAdapter ideaAdapter;
+    private IdeaAdapter ideaAdapter;
     RecyclerView recyclerView;
     SharedPreferences preferences;
-    private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     TextView drawerUsername, drawerAppCount;
     CircleImageView circleImageView;
-    private String displayPicturePath;
     View headerView;
     NavigationView navigationView;
     IdeaRepository ideaRepository;
-    public static final int IMPORT_IMAGE_REQUESTCODE = 998;
+    public static final int IMPORT_IMAGE_REQUEST_CODE = 998;
 
-    private static final String TAG = "ViewIdeas";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +89,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         Toolbar appbar = findViewById(R.id.appBar);
         setSupportActionBar(appbar);
 
-        drawerLayout = findViewById(R.id.drawerLayout);
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
@@ -110,7 +107,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         recyclerView = findViewById(R.id.recyclerView);
 
 
-        //setupPreferences() retrieve persisted data from the datastore and links to ideas list
+        //setupPreferences() seta up shared preference and retrieves ideas list
         setupPreferences();
 
 
@@ -138,25 +135,18 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: Image import code goes here
-                //Toast.makeText(getApplicationContext(),"call importImage();", Toast.LENGTH_SHORT ).show();
 
                 importImage();
             }
         });
 
-        if (preferences.getString(DISPLAY_PICTURE_KEY, "") != ""){
+        if (!preferences.getString(DISPLAY_PICTURE_KEY, "").equals("")){
             circleImageView.setImageBitmap(getBitmapFromPreferences());
         }
-
-
-
-
 
     }
 
     private Bitmap getBitmapFromPreferences() {
-        //TODO: retrieve image from preferences
         String displayPicture = preferences.getString(DISPLAY_PICTURE_KEY,"");
         File f = new File(displayPicture);
 
@@ -176,11 +166,11 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUESTCODE );
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUEST_CODE);
             }else{
 
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUEST_CODE);
 
             }
         }
@@ -193,12 +183,12 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == IMPORT_IMAGE_REQUESTCODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+        if (requestCode == IMPORT_IMAGE_REQUEST_CODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUEST_CODE);
             }
         }
 
@@ -208,7 +198,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == IMPORT_IMAGE_REQUESTCODE && data != null){
+        if (requestCode == IMPORT_IMAGE_REQUEST_CODE && data != null){
 
             Uri selectedImage = data.getData();
             Bitmap bitmap;
@@ -220,7 +210,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
                 //Save selected image to Local Storage
                 SaveToInternalStorage saveObject = new SaveToInternalStorage();
-                displayPicturePath = saveObject.execute(bitmap).get();
+                String displayPicturePath = saveObject.execute(bitmap).get();
 
                 //Check to see if display picture has been selected before
                 if (!preferences.getString(DISPLAY_PICTURE_KEY, "").equals("")){
@@ -285,12 +275,10 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         }
 
 
-
-        Bitmap srcBitmap;
         is = context.getContentResolver().openInputStream(photoUri);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = scale;
-        srcBitmap = BitmapFactory.decodeStream(is, null, options);
+        Bitmap srcBitmap = BitmapFactory.decodeStream(is, null, options);
         assert is != null;
         is.close();
 
@@ -302,6 +290,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
             Matrix matrix = new Matrix();
             matrix.postRotate(orientation);
 
+            assert srcBitmap != null;
             srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
                     srcBitmap.getHeight(), matrix, true);
         }
@@ -331,26 +320,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         drawerAppCount = headerView.findViewById(R.id.drawerAppsCount);
         drawerAppCount.setText(new StringBuilder().append("Currently working on ").append(ideas.size()).append(" apps."));
     }
-
-    /*//Method that is called on return to onCreate from a previously visited activity
-    //Pretty much just notifies the recyclerView's Adapter about a possible change in dataset
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == NewIdea.NEW_IDEAS_RESULTCODE ){
-
-            ideaAdapter.notifyDataSetChanged();
-
-        }else if(resultCode == DetailedPage.DETAILED_PAGE_RESULTCODE ){
-
-            ideaAdapter.notifyDataSetChanged();
-
-        }
-
-
-    }*/
-
 
 
     //Starts an activity after an idea is clicked on in the recyclerView
@@ -422,26 +391,13 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
 
             try {
-                f.delete();
+                boolean status = f.delete();
+                Log.i(TAG, "Delete status: " + status);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        //Persist data to data-store
-//        savePreferences();
     }
 
 
@@ -475,14 +431,14 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
             @Override
             public boolean onQueryTextSubmit(String s) {
 
-                ViewIdeas.ideaAdapter.getFilter().filter(s);
+                ideaAdapter.getFilter().filter(s);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
 
-                ViewIdeas.ideaAdapter.getFilter().filter(s);
+                ideaAdapter.getFilter().filter(s);
                 return false;
             }});
 
@@ -502,7 +458,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         if (item.getItemId() == R.id.exitApp){
 
-//            savePreferences();
             logout();
             Intent exit = new Intent(Intent.ACTION_MAIN);
             exit.addCategory(Intent.CATEGORY_HOME);
@@ -521,18 +476,15 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     public void logout(){
 
-//        savePreferences();
-
         Intent logout = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(logout);
 
         finish();
-
     }
 
 
 
-    //Links to data-store to retrieve persisted data, called in onCreate
+    //Initializes shared Preference and gets Ideas to be displayed
     public void setupPreferences() {
 
         preferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
@@ -619,7 +571,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
             String imagePath = mypath.getAbsolutePath();
 
-            FileOutputStream fileOutputStream = null;
+            FileOutputStream fileOutputStream;
             Log.i("NewIdea", "About to commence save");
 
             try {
@@ -643,9 +595,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
             return null;
         }
     }
-
-
-
 
 
 }

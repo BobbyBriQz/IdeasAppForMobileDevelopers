@@ -20,14 +20,13 @@ import java.util.List;
 
 public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder> {
 
-    //private ArrayList<Bitmap> bitmaps;
     private String fullPath;
     private List<String> imageNames;
 
 
-    Context context;
-    OnBitmapClickListener onBitmapClickListener;
-    OnLongBitmapClickListener onLongBitmapClickListener;
+    private Context context;
+    private OnBitmapClickListener onBitmapClickListener;
+    private OnLongBitmapClickListener onLongBitmapClickListener;
 
     public BitmapAdapter(String fullPath, List<String> imageNames, Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
         //this.bitmaps = bitmaps;
@@ -54,8 +53,7 @@ public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder
 
         View view = LayoutInflater.from(context).inflate(R.layout.card_image_rv, viewGroup, false);
 
-        ViewHolder viewHolder = new ViewHolder(view, onBitmapClickListener, onLongBitmapClickListener);
-        return viewHolder;
+        return new ViewHolder(view, onBitmapClickListener, onLongBitmapClickListener);
     }
 
     @Override

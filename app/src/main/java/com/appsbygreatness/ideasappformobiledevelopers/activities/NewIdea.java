@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +32,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
@@ -41,9 +39,7 @@ import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,7 +70,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     List<Todo> todos;
     IdeaRepository ideaRepository;
 
-    public static final int NEW_IDEAS_RESULTCODE = 11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -320,7 +315,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
             File mypath = new File(directory, (imageName));
 
-            FileOutputStream fileOutputStream = null;
+            FileOutputStream fileOutputStream;
             Log.i("NewIdea", "About to commence save");
 
             try {
@@ -386,6 +381,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
             Matrix matrix = new Matrix();
             matrix.postRotate(orientation);
 
+            assert srcBitmap != null;
             srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
                     srcBitmap.getHeight(), matrix, true);
         }

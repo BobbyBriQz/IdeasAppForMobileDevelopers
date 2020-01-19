@@ -1,8 +1,6 @@
 package com.appsbygreatness.ideasappformobiledevelopers.repository;
 
 import android.content.Context;
-import androidx.room.Room;
-
 import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.dao.IdeaDao;
 import com.appsbygreatness.ideasappformobiledevelopers.database.IdeaDatabase;

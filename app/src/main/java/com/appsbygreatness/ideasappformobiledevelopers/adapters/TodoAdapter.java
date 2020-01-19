@@ -18,11 +18,11 @@ import java.util.List;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
-    List<Todo> todos;
-    Context context;
+    private List<Todo> todos;
+    private Context context;
 
-    OnTodoDeleteClickListener onTodoDeleteClickListener;
-    OnTodoCompleteClickListener onTodoCompleteClickListener;
+    private OnTodoDeleteClickListener onTodoDeleteClickListener;
+    private OnTodoCompleteClickListener onTodoCompleteClickListener;
 
     public TodoAdapter(List<Todo> todos, Context context, OnTodoDeleteClickListener onTodoDeleteClickListener, OnTodoCompleteClickListener onTodoCompleteClickListener) {
         this.todos = todos;
@@ -36,9 +36,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.todo_card_layout, viewGroup, false);
 
-        ViewHolder holder = new ViewHolder(view, onTodoCompleteClickListener, onTodoDeleteClickListener);
-
-        return holder;
+        return new ViewHolder(view, onTodoCompleteClickListener, onTodoDeleteClickListener);
     }
 
     @Override
