@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android-studio/plugins/android/lib/android.jar!/images/material_design_icons/toggle/ic_check_box_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_wb_sunny_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="1e7b14" />
-                            <entry key="outputName" value="ic_check_box" />
+                            <entry key="outputName" value="ic_wb_sunny" />
                             <entry key="sourceFile" value="C:\Users\Dell" />
                           </map>
                         </option>

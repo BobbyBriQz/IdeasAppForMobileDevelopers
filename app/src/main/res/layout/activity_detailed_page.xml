@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?attr/activityBackgroundTint"
     tools:context=".activities.DetailedPage">
 
 
@@ -15,9 +16,8 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/detailedAppbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-        </androidx.appcompat.widget.Toolbar>
+            android:layout_height="?attr/actionBarSize"
+            android:background="?appBarColor"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
@@ -27,34 +27,52 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
+            <EditText
+                android:id="@+id/detailedAppName"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:inputType="textCapWords"
+                android:hint="Please enter app name"
+                android:backgroundTint="?attr/editTextBackgroundColor"
+                android:minHeight="40dp"
+                android:layout_marginHorizontal="10dp"
+                android:padding="10dp" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/detailedAppName"
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="188dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/detailedRV"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#ffffff"
-                    android:hint="App name"
-                    android:inputType="textCapWords"
-                    android:minHeight="40dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:padding="10dp" />
+                    android:layout_height="160dp"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/card_image_rv"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/importImageFAB"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="132dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/ic_import_image" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/detailedRV"
-                android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/card_image_rv">
-
-            </androidx.recyclerview.widget.RecyclerView>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,7 +80,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="10dp"
                 android:text="APP IDEA"
-                android:textColor="#000000"
+                android:textColor="?attr/primaryTextColor"
                 android:textStyle="bold" />
 
             <EditText
@@ -85,7 +103,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="10dp"
                 android:text="FUNCTIONALITY"
-                android:textColor="#000000"
+                android:textColor="?attr/primaryTextColor"
                 android:textStyle="bold" />
 
             <EditText
@@ -109,7 +127,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="10dp"
                 android:text="//TODO "
-                android:textColor="#000000"
+                android:textColor="?attr/primaryTextColor"
                 android:textStyle="bold" />
 
             <RelativeLayout
@@ -142,7 +160,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:background="@drawable/login_button_bg"
+                    android:background="@drawable/add_todo_bg"
                     android:hint="Add new task to do"
                     android:inputType="textCapSentences"
                     android:paddingStart="10dp"

@@ -1,6 +1,5 @@
 package com.appsbygreatness.ideasappformobiledevelopers.adapters;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -24,7 +23,7 @@ import java.util.List;
 
 public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
-    private Context context;
+
     private List<Idea> ideas;
     private List<Idea> filterList;
 
@@ -32,8 +31,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
     private OnLongIdeaClickListener onLongIdeaClickListener;
     private CustomFilter filter;
 
-    public IdeaAdapter(Context context, List<Idea> ideas, OnIdeaClickListener onIdeaClickListener, OnLongIdeaClickListener onLongIdeaClickListener) {
-        this.context = context;
+    public IdeaAdapter(List<Idea> ideas, OnIdeaClickListener onIdeaClickListener, OnLongIdeaClickListener onLongIdeaClickListener) {
         this.ideas = ideas;
         this.filterList = ideas;
         this.onIdeaClickListener = onIdeaClickListener;
@@ -46,9 +44,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_layout, viewGroup, false);
 
-        ViewHolder holder = new ViewHolder(view, onIdeaClickListener, onLongIdeaClickListener);
-
-        return holder;
+        return new ViewHolder(view, onIdeaClickListener, onLongIdeaClickListener);
     }
 
     @Override

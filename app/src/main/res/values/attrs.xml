@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="Theme">
+        <attr name="activityBackgroundTint" format="reference|color"/>
+        <attr name="primaryTextColor" format="color"/>
+        <attr name="headerTextColor" format="color" />
+        <attr name="headerBackgroundColor" format="color"/>
+        <attr name="appBarColor" format="color"/>
+        <attr name="editTextBackgroundColor" format="color"/>
+        <attr name="editTextBGColor" format="color"/>
+        <attr name="iconsTint" format="color"/>
+
+    </declare-styleable>
+</resources>

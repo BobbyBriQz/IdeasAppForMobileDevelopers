@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -38,6 +40,7 @@ import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,6 +67,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     TodoAdapter todoAdapter;
     RecyclerView newTodoRV;
     ImageButton newAddTodoButton;
+    FloatingActionButton importImageFAB;
 
     String imageName, fullPath = "/data/user/0/com.appsbygreatness.ideasappformobiledevelopers/app_Images";
     ArrayList<String> imageNames;
@@ -73,6 +77,9 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES){
+            setTheme(R.style.DarkTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_idea);
 
@@ -96,6 +103,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         newFunctionality = findViewById(R.id.newFunctionality);
         newAddTodoButton = findViewById(R.id.newAddTodoButton);
         newAddTodoET = findViewById(R.id.newAddTodoET);
+        importImageFAB = findViewById(R.id.newImportImageFAB);
 
 
         RecyclerView newRV = findViewById(R.id.newRV);
@@ -116,10 +124,26 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         newTodoRV.setAdapter(todoAdapter);
         newTodoRV.setLayoutManager(new LinearLayoutManager( this, LinearLayoutManager.VERTICAL, false));
 
+        importImageFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                importImage();
+            }
+        });
+
         newAddTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                todos.add(new Todo(newAddTodoET.getText().toString(), false));
+                String todo = newAddTodoET.getText().toString();
+
+                if(todo.trim().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Please input task to do", Toast.LENGTH_SHORT)
+                            .show();
+
+                    return;
+                }
+
+                todos.add(new Todo(todo, false));
                 newAddTodoET.setText("");
                 todoAdapter.notifyDataSetChanged();
             }
@@ -141,10 +165,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
             saveNewIdea();
 
-
-        }else if (item.getItemId() == R.id.importImage){
-
-            importImage();
 
         }
 

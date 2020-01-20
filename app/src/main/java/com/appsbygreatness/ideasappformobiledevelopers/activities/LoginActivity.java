@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
                 return true;
             }
 
+
             });
 
         loginPassword.setTransformationMethod(new AsteriskPasswordTransformationMethod());

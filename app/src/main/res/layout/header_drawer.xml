@@ -10,7 +10,7 @@
     android:paddingBottom="10dp"
     android:paddingStart="5dp"
     android:paddingEnd="5dp"
-    android:background="#EBC6A6">
+    android:background="?attr/headerBackgroundColor">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -41,12 +41,14 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:text="Username"
+            android:textColor="?attr/headerTextColor"
             android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/drawerAppsCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="?attr/headerTextColor"
             android:text="Currently working on x apps"/>
 
 

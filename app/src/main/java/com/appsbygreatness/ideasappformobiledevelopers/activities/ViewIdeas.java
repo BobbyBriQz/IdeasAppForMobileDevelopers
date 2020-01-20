@@ -18,12 +18,14 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,6 +44,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,6 +85,9 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES){
+            setTheme(R.style.DarkTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_ideas);
 
@@ -507,7 +513,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     public void setUpRecyclerView(){
 
         //RecyclerView custom IdeaAdapter is created with the ideas list
-        ideaAdapter = new IdeaAdapter(this, ideas, this, this);
+        ideaAdapter = new IdeaAdapter(ideas, this, this);
 
         //Adapter is attached to the recyclerView instance and preferred Layout is set
         recyclerView.setAdapter(ideaAdapter);
@@ -528,6 +534,26 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                 startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
 
             }else if (menuItem.getItemId() == R.id.suggest){
+
+
+            }else if (menuItem.getItemId() == R.id.toggleDarkMode){
+                //Switch themes
+                SharedPreferences.Editor editor = preferences.edit();
+                int currentTheme = AppCompatDelegate.getDefaultNightMode();
+
+
+                if(currentTheme != AppCompatDelegate.MODE_NIGHT_YES){
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    editor.putBoolean("NIGHT MODE", true);
+                    editor.apply();
+
+
+                }else{
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    editor.putBoolean("NIGHT MODE", false);
+                    editor.apply();
+                }
 
 
             }else if (menuItem.getItemId() == R.id.aboutDeveloperDialogFragment){

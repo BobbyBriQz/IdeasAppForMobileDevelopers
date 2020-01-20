@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -39,6 +41,7 @@ import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Todo;
 import com.appsbygreatness.ideasappformobiledevelopers.repository.IdeaRepository;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +59,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     int id;
     ImageButton addTodoButton;
     Idea idea;
+    FloatingActionButton importImageFAB;
     RecyclerView detailedRV, todoRV;
     BitmapAdapter adapter;
     TodoAdapter todoAdapter;
@@ -67,8 +71,12 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES){
+            setTheme(R.style.DarkTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_page);
+
 
         Toolbar detailedAppbar = findViewById(R.id.detailedAppbar);
         setSupportActionBar(detailedAppbar);
@@ -96,6 +104,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         detailedAppName = findViewById(R.id.detailedAppName);
         detailedAppIdea = findViewById(R.id.detailedAppIdea);
         detailedFunctionality = findViewById(R.id.detailedFunctionality);
+        importImageFAB = findViewById(R.id.importImageFAB);
 
         ideaRepository = new IdeaRepository(this);
 
@@ -117,6 +126,13 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             }
         });
 
+        importImageFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                importImage();
+            }
+        });
+
         addTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,11 +145,13 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
                     return;
                 }
 
-                idea.getTodo().add(new Todo(addTodoET.getText().toString(), false));
+                idea.getTodo().add(new Todo(todo, false));
                 addTodoET.setText("");
                 todoAdapter.notifyDataSetChanged();
             }
         });
+
+
 
     }
 
@@ -402,9 +420,6 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             saveIdea();
 
 
-        }if (item.getItemId() == R.id.importImage){
-
-            importImage();
         }
 
         return super.onOptionsItemSelected(item);
