@@ -8,6 +8,7 @@
 
     <gradient android:startColor="#ffffff"
         android:endColor="#ffffff"/>
+    <stroke android:color="?attr/primaryTextColor" android:width="2dp"/>
 
 
 

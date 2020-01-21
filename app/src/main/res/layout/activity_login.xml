@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#454545"
+    android:background="?attr/activityBackgroundTint"
     tools:context=".activities.LoginActivity">
 
 
@@ -17,7 +17,7 @@
         android:gravity="center"
         android:paddingLeft="5dp"
         android:text="Welcome, please login below"
-        android:textColor="#ffffff"
+        android:textColor="?attr/primaryTextColor"
         android:textSize="16dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,9 +37,10 @@
         android:drawableStart="@drawable/ic_password"
         android:gravity="center"
         android:inputType="numberPassword"
-        android:paddingLeft="5dp"
-        android:paddingRight="25dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="25dp"
         android:textSize="20sp"
+        android:textColor="#353535"
         app:layout_constraintBottom_toTopOf="@+id/passwordKeypadLL"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,7 +73,7 @@
                 android:onClick="onClick"
                 android:tag="1"
                 android:text="1"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -83,7 +84,7 @@
                 android:onClick="onClick"
                 android:tag="2"
                 android:text="2"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -94,7 +95,7 @@
                 android:onClick="onClick"
                 android:tag="3"
                 android:text="3"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -113,7 +114,7 @@
                 android:onClick="onClick"
                 android:tag="4"
                 android:text="4"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -124,7 +125,7 @@
                 android:onClick="onClick"
                 android:tag="5"
                 android:text="5"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -135,7 +136,7 @@
                 android:onClick="onClick"
                 android:tag="6"
                 android:text="6"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -154,7 +155,7 @@
                 android:onClick="onClick"
                 android:tag="7"
                 android:text="7"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -165,7 +166,7 @@
                 android:onClick="onClick"
                 android:tag="8"
                 android:text="8"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -176,7 +177,7 @@
                 android:onClick="onClick"
                 android:tag="9"
                 android:text="9"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -195,6 +196,7 @@
                 android:layout_weight="1"
                 android:tag="fingerprint"
                 android:onClick="onClick"
+                android:backgroundTint="?attr/primaryTextColor"
                 android:background="@drawable/ic_fingerprint" />
 
             <Button
@@ -205,7 +207,7 @@
                 android:onClick="onClick"
                 android:tag="0"
                 android:text="0"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
             <Button
@@ -217,7 +219,7 @@
                 android:onClick="onClick"
                 android:paddingStart="14dp"
                 android:tag="delete"
-                android:textColor="#ffffff"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -235,6 +237,7 @@
         android:layout_marginBottom="72dp"
         android:background="@drawable/button_round"
         android:text="Login"
+        android:textColor="#353535"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
