@@ -53,7 +53,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static com.appsbygreatness.ideasappformobiledevelopers.activities.DetailedPage.IMPORT_IMAGE_REQUESTCODE;
+import static com.appsbygreatness.ideasappformobiledevelopers.activities.DetailedPage.IMPORT_IMAGE_REQUEST_CODE;
 
 public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener,
         TodoAdapter.OnTodoDeleteClickListener, TodoAdapter.OnTodoCompleteClickListener {
@@ -185,7 +185,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         String functionality = newFunctionality.getText().toString();
 
         Date date = Calendar.getInstance().getTime();
-        String timeStamp = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date);
+        String timeStamp = new SimpleDateFormat("YYYY-MM-dd, HH:mm:ss a", Locale.getDefault()).format(date);
 
         Idea idea = new Idea(appName, appIdea, functionality, todos, timeStamp, fullPath, imageNames);
 
@@ -210,11 +210,11 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUESTCODE );
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUEST_CODE);
             }else{
 
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUEST_CODE);
 
             }
         }
@@ -227,12 +227,12 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == IMPORT_IMAGE_REQUESTCODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+        if (requestCode == IMPORT_IMAGE_REQUEST_CODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUEST_CODE);
             }
         }
 
@@ -242,7 +242,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == IMPORT_IMAGE_REQUESTCODE && data != null){
+        if (requestCode == IMPORT_IMAGE_REQUEST_CODE && data != null){
 
             Uri selectedImage = data.getData();
 

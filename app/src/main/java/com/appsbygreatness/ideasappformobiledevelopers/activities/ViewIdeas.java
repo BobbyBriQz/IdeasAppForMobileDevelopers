@@ -545,12 +545,16 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                 if(currentTheme != AppCompatDelegate.MODE_NIGHT_YES){
 
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
+                    //Save theme choice to SharedPreferences
                     editor.putBoolean("NIGHT MODE", true);
                     editor.apply();
 
 
                 }else{
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+                    //Save theme choice to SharedPreferences
                     editor.putBoolean("NIGHT MODE", false);
                     editor.apply();
                 }

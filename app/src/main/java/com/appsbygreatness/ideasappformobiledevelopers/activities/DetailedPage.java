@@ -67,7 +67,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     String imageName, fullPath;
     IdeaRepository ideaRepository;
 
-    public static final int IMPORT_IMAGE_REQUESTCODE = 111;
+    public static final int IMPORT_IMAGE_REQUEST_CODE = 111;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,8 +151,6 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
             }
         });
 
-
-
     }
 
     private void killActivity() {
@@ -187,7 +185,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        if (requestCode == IMPORT_IMAGE_REQUESTCODE && data!= null){
+        if (requestCode == IMPORT_IMAGE_REQUEST_CODE && data!= null){
 
             Uri selectedImage = data.getData();
             Log.i("DetailedPage", "gotten Uri, about to load bitmap");
@@ -268,11 +266,8 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
                 Log.i("DetailedPage", "Save to internal storage: failed ");
             }
 
-
             return null;
         }
-
-
 
     }
 
@@ -435,7 +430,9 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         }
 
         Date date = Calendar.getInstance().getTime();
-        String timeStamp = new SimpleDateFormat("dd-MM-YYYY, HH:mm:ss a", Locale.getDefault()).format(date);
+
+
+        String timeStamp = new SimpleDateFormat("YYYY-MM-dd, HH:mm:ss a", Locale.getDefault()).format(date);
 
 
 
@@ -443,7 +440,6 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         idea.setName(detailedAppName.getText().toString());
         idea.setIdea(detailedAppIdea.getText().toString());
         idea.setFunctionality(detailedFunctionality.getText().toString());
-        //idea.setTodo(detailedTodo.getText().toString());
         idea.setTimestamp(timeStamp);
 
         ideaRepository.updateIdea(idea);
@@ -459,11 +455,11 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUESTCODE );
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMPORT_IMAGE_REQUEST_CODE);
             }else{
 
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+                startActivityForResult(intent, IMPORT_IMAGE_REQUEST_CODE);
 
             }
         }
@@ -475,12 +471,12 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-            if (requestCode == IMPORT_IMAGE_REQUESTCODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            if (requestCode == IMPORT_IMAGE_REQUEST_CODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
                     Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, IMPORT_IMAGE_REQUESTCODE);
+                    startActivityForResult(intent, IMPORT_IMAGE_REQUEST_CODE);
                 }
             }
 

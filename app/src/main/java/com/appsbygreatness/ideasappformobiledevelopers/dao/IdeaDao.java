@@ -17,7 +17,7 @@ public interface IdeaDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertIdea(Idea idea);
 
-    @Query("SELECT * from idea_table")
+    @Query("SELECT * from idea_table ORDER BY timestamp DESC")
     List<Idea> getAllIdeas();
 
     @Query("SELECT * FROM idea_table WHERE id = :id ")
