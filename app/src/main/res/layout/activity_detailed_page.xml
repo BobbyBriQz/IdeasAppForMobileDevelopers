@@ -46,7 +46,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="188dp">
+                android:layout_height="200dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/detailedRV"
@@ -64,11 +64,12 @@
                     android:id="@+id/importImageFAB"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:layout_marginTop="132dp"
+                    android:layout_marginTop="130dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:src="@drawable/ic_import_image" />
+                    android:src="@drawable/ic_import_image"
+                    android:backgroundTint="?attr/editTextBackgroundColor"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -77,7 +78,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_marginStart="10dp"
                 android:text="APP IDEA"
                 android:textColor="?attr/primaryTextColor"

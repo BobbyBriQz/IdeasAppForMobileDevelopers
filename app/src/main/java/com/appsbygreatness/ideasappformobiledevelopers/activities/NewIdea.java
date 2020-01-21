@@ -87,7 +87,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         setSupportActionBar(newAppbar);
 
         assert getSupportActionBar() != null;
-        getSupportActionBar().setTitle("Register new app idea");
+        getSupportActionBar().setTitle("Add new app idea");
         newAppbar.setNavigationIcon(R.drawable.ic_arrow_back);
         newAppbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,7 +139,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
                 if(todo.trim().isEmpty()){
                     Toast.makeText(getApplicationContext(), "Please input task to do", Toast.LENGTH_SHORT)
                             .show();
-
                     return;
                 }
 
@@ -164,8 +163,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         if (item.getItemId() == R.id.saveIdea) {
 
             saveNewIdea();
-
-
         }
 
         return super.onOptionsItemSelected(item);
