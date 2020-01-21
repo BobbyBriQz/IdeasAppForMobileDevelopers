@@ -32,6 +32,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:src="@drawable/bobby"
+                android:contentDescription="Developer's picture"
                 />
         </androidx.cardview.widget.CardView>
 

@@ -7,11 +7,4 @@
         android:icon="@drawable/ic_save"
         app:showAsAction="always"/>
 
-   <!-- <item android:id="@+id/importImage"
-        android:title="Import image"
-        android:icon="@drawable/ic_import_image"
-        app:showAsAction="always"/>-->
-
-
-
 </menu>

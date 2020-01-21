@@ -12,6 +12,7 @@
         android:id="@+id/imageBitmapRV"
         android:layout_width="140dp"
         android:layout_height="160dp"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:contentDescription="Image in recyclerView"/>
 
 </androidx.cardview.widget.CardView>

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="fitCenter"
-        android:layout_gravity="center_vertical"/>
+        android:layout_gravity="center_vertical"
+        android:contentDescription="Image displayed"/>
 
     <ImageView
         android:id="@+id/bitmapBackButton"
@@ -19,6 +20,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:src="@drawable/ic_arrow_back"
+        android:contentDescription="back button"
         />
 
 
