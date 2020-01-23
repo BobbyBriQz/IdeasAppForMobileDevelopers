@@ -18,7 +18,7 @@
         android:gravity="center"
         android:paddingStart="5dp"
         android:paddingEnd="0dp"
-        android:text="Welcome, please login below"
+        android:text="@string/welcome_login"
         android:textColor="?attr/primaryTextColor"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -77,9 +77,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="1"
-                android:text="1"
+                android:text="@string/_1"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -89,9 +90,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="2"
-                android:text="2"
+                android:text="@string/_2"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -101,9 +103,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="3"
-                android:text="3"
+                android:text="@string/_3"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
         </LinearLayout>
 
@@ -122,9 +125,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="4"
-                android:text="4"
+                android:text="@string/_4"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -134,9 +138,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="5"
-                android:text="5"
+                android:text="@string/_5"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -146,9 +151,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="6"
-                android:text="6"
+                android:text="@string/_6"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
         </LinearLayout>
 
@@ -167,9 +173,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="7"
-                android:text="7"
+                android:text="@string/_7"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -179,9 +186,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="8"
-                android:text="8"
+                android:text="@string/_8"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -191,9 +199,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="9"
-                android:text="9"
+                android:text="@string/_9"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
         </LinearLayout>
 
@@ -213,7 +222,8 @@
                 android:tag="fingerprint"
                 android:onClick="onClick"
                 android:backgroundTint="?attr/primaryTextColor"
-                android:background="@drawable/ic_fingerprint" />
+                android:background="@drawable/ic_fingerprint"
+                tools:ignore="ButtonStyle,InefficientWeight" />
 
             <Button
                 android:layout_width="56dp"
@@ -223,9 +233,10 @@
                 android:background="@drawable/login_button_bg"
                 android:onClick="onClick"
                 android:tag="0"
-                android:text="0"
+                android:text="@string/_0"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
             <Button
                 android:layout_width="56dp"
@@ -239,7 +250,8 @@
                 android:paddingEnd="0dp"
                 android:tag="delete"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ButtonStyle" />
 
         </LinearLayout>
 
@@ -255,7 +267,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="72dp"
         android:background="@drawable/button_round"
-        android:text="Login"
+        android:text="@string/login"
         android:textColor="#353535"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

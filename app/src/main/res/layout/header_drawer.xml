@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="144dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -40,7 +39,7 @@
             android:id="@+id/drawerUserName"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:text="Username"
+            android:text="@string/username"
             android:textColor="?attr/headerTextColor"
             android:textStyle="bold"/>
 
@@ -49,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?attr/headerTextColor"
-            android:text="Currently working on x apps"/>
+            android:text="@string/currently_working_on"/>
 
 
     </LinearLayout>

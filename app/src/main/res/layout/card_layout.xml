@@ -22,7 +22,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/ic_launcher_background"
-            android:contentDescription="This is the image of the idea"
+            android:contentDescription="@string/idea_image"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintBottom_toBottomOf="@id/constrainLayout"

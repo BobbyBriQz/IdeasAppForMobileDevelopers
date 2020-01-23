@@ -32,7 +32,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:src="@drawable/bobby"
-                android:contentDescription="Developer's picture"
+                android:contentDescription="@string/developer_picture"
                 />
         </androidx.cardview.widget.CardView>
 
@@ -40,7 +40,7 @@
             android:id="@+id/developerName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bobby Utulu"
+            android:text="@string/bobby_utulu"
             android:textSize="18sp"
             android:textColor="?attr/primaryTextColor"
             android:fontFamily="sans-serif-medium"
@@ -49,7 +49,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Android developer | Tech enthusiast"
+            android:text="@string/about_developer"
             android:textSize="16sp"
             android:textColor="?attr/primaryTextColor"
             android:layout_marginTop="5dp"

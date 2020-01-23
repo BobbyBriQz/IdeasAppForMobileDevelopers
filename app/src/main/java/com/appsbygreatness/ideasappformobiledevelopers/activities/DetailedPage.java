@@ -9,11 +9,15 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.MediaStore;
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +62,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     EditText detailedAppName, detailedAppIdea, detailedFunctionality, addTodoET;
     int id;
     ImageButton addTodoButton;
+    KonfettiView viewKonfetti;
     Idea idea;
     FloatingActionButton importImageFAB;
     RecyclerView detailedRV, todoRV;
@@ -105,6 +110,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         detailedAppIdea = findViewById(R.id.detailedAppIdea);
         detailedFunctionality = findViewById(R.id.detailedFunctionality);
         importImageFAB = findViewById(R.id.importImageFAB);
+        viewKonfetti = findViewById(R.id.viewKonfetti);
 
         ideaRepository = new IdeaRepository(this);
 
@@ -387,6 +393,19 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         idea.getTodo().get(position).setCompleted(stateAfterClick);
 
         todoAdapter.notifyDataSetChanged();
+
+        if(stateAfterClick){
+            viewKonfetti.build()
+                    .addColors(Color.YELLOW,Color.GREEN, Color.MAGENTA, Color.BLUE)
+                    .setDirection(0.0, 359.0)
+                    .setSpeed(1f,5f)
+                    .setFadeOutEnabled(true)
+                    .setTimeToLive(2000L)
+                    .addShapes(Shape.RECT, Shape.CIRCLE)
+                    .addSizes(new Size(12, 5))
+                    .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                    .streamFor(300,5000L);
+        }
     }
 
     @Override

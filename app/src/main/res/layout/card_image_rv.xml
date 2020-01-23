@@ -13,6 +13,6 @@
         android:layout_width="140dp"
         android:layout_height="160dp"
         android:scaleType="centerCrop"
-        android:contentDescription="Image in recyclerView"/>
+        android:contentDescription="@string/idea_image"/>
 
 </androidx.cardview.widget.CardView>

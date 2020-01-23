@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -53,6 +54,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
+
 import static com.appsbygreatness.ideasappformobiledevelopers.activities.DetailedPage.IMPORT_IMAGE_REQUEST_CODE;
 
 public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener,
@@ -65,11 +70,12 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     Bitmap bitmap;
     BitmapAdapter adapter;
     TodoAdapter todoAdapter;
+    KonfettiView viewKonfetti;
     RecyclerView newTodoRV;
     ImageButton newAddTodoButton;
     FloatingActionButton importImageFAB;
 
-    String imageName, fullPath = "/data/user/0/com.appsbygreatness.ideasappformobiledevelopers/app_Images";
+    String imageName, fullPath = this.getString(R.string.image_directory_path);
     ArrayList<String> imageNames;
     List<Todo> todos;
     IdeaRepository ideaRepository;
@@ -104,6 +110,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         newAddTodoButton = findViewById(R.id.newAddTodoButton);
         newAddTodoET = findViewById(R.id.newAddTodoET);
         importImageFAB = findViewById(R.id.newImportImageFAB);
+        viewKonfetti = findViewById(R.id.newViewKonfetti);
 
 
         RecyclerView newRV = findViewById(R.id.newRV);
@@ -304,6 +311,19 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         todos.get(position).setCompleted(stateAfterClick);
 
         todoAdapter.notifyDataSetChanged();
+
+        if(stateAfterClick){
+            viewKonfetti.build()
+                    .addColors(Color.YELLOW,Color.GREEN, Color.MAGENTA, Color.BLUE)
+                    .setDirection(0.0, 359.0)
+                    .setSpeed(1f,5f)
+                    .setFadeOutEnabled(true)
+                    .setTimeToLive(2000L)
+                    .addShapes(Shape.RECT, Shape.CIRCLE)
+                    .addSizes(new Size(12, 5))
+                    .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                    .streamFor(300,5000L);
+        }
     }
 
     @Override
@@ -479,7 +499,9 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
             File f = new File(imagePath, imageName);
 
             try {
-                f.delete();
+                boolean isImageDeleted = f.delete();
+
+                Log.i("isImageDeleted:", String.valueOf(isImageDeleted));
 
             } catch (Exception e) {
                 e.printStackTrace();
