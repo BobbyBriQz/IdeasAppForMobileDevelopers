@@ -396,7 +396,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
         if(stateAfterClick){
             viewKonfetti.build()
-                    .addColors(Color.YELLOW,Color.GREEN, Color.MAGENTA, Color.BLUE)
+                    .addColors(Color.GRAY,Color.CYAN, Color.MAGENTA, Color.BLUE)
                     .setDirection(0.0, 359.0)
                     .setSpeed(1f,5f)
                     .setFadeOutEnabled(true)

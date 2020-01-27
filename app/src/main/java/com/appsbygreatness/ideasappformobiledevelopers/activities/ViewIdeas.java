@@ -78,6 +78,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     TextView drawerUsername, drawerAppCount;
     CircleImageView circleImageView;
     View headerView;
+    DrawerLayout drawerLayout;
     NavigationView navigationView;
     IdeaRepository ideaRepository;
     public static final int IMPORT_IMAGE_REQUEST_CODE = 998;
@@ -95,7 +96,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         Toolbar appbar = findViewById(R.id.appBar);
         setSupportActionBar(appbar);
 
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        drawerLayout = findViewById(R.id.drawerLayout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
@@ -567,6 +568,8 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                 AboutDeveloperDialogFragment aboutDeveloperDialogFragment = new AboutDeveloperDialogFragment();
 
                 aboutDeveloperDialogFragment.show(getSupportFragmentManager(),"");
+
+                drawerLayout.closeDrawers();
 
 
             }else if(menuItem.getItemId() == R.id.rateApp){

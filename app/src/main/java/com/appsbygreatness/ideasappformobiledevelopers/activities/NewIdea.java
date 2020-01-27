@@ -75,7 +75,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     ImageButton newAddTodoButton;
     FloatingActionButton importImageFAB;
 
-    String imageName, fullPath = this.getString(R.string.image_directory_path);
+    String imageName, fullPath;
     ArrayList<String> imageNames;
     List<Todo> todos;
     IdeaRepository ideaRepository;
@@ -103,6 +103,8 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
                 killActivity();
             }
         });
+
+        fullPath = this.getString(R.string.image_directory_path);
 
         newAppName = findViewById(R.id.newAppName);
         newAppIdea = findViewById(R.id.newAppIdea);
@@ -314,7 +316,7 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
         if(stateAfterClick){
             viewKonfetti.build()
-                    .addColors(Color.YELLOW,Color.GREEN, Color.MAGENTA, Color.BLUE)
+                    .addColors(Color.GRAY,Color.CYAN, Color.MAGENTA, Color.BLUE)
                     .setDirection(0.0, 359.0)
                     .setSpeed(1f,5f)
                     .setFadeOutEnabled(true)

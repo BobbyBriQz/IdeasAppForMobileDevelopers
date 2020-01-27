@@ -19,7 +19,6 @@ public class Idea {
     private int id;
 
     private String name;
-
     private String idea;
 
     private String functionality;

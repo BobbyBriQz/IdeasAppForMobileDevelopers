@@ -39,6 +39,8 @@
             android:paddingEnd="0dp"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textColor="?attr/primaryTextColor"
             app:layout_constraintBottom_toTopOf="@id/guideline3"
             app:layout_constraintEnd_toEndOf="@id/constrainLayout"

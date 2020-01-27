@@ -69,6 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
                     startActivity(intent);
+                    finish();
                 }
             }
         });
