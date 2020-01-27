@@ -1,5 +1,6 @@
 package com.appsbygreatness.ideasappformobiledevelopers.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -18,10 +19,10 @@ public interface IdeaDao {
     void insertIdea(Idea idea);
 
     @Query("SELECT * from idea_table ORDER BY timestamp DESC")
-    List<Idea> getAllIdeas();
+    LiveData<List<Idea>> getAllIdeas();
 
     @Query("SELECT * FROM idea_table WHERE id = :id ")
-    Idea getIdea(int id);
+    LiveData<Idea> getIdea(int id);
 
     @Query("DELETE FROM idea_table WHERE id = :id ")
     void deleteIdea(int id);

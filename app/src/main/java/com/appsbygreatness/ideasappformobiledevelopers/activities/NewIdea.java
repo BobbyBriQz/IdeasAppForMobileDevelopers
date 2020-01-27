@@ -124,8 +124,12 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
 
 
 
-        adapter = new BitmapAdapter(fullPath, imageNames,this, this, this);
-        todoAdapter = new TodoAdapter(todos, this, this, this);
+        adapter = new BitmapAdapter(this, this, this);
+        adapter.setImageNames(imageNames);
+        adapter.setFullPath(fullPath);
+        
+        todoAdapter = new TodoAdapter(this, this, this);
+        todoAdapter.setTodos(todos);
 
         newRV.setAdapter(adapter);
         newRV.setLayoutManager(new LinearLayoutManager( this, LinearLayoutManager.HORIZONTAL, false));

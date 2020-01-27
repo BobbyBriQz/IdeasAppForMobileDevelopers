@@ -26,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -54,7 +56,9 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnBitmapClickListener, BitmapAdapter.OnLongBitmapClickListener,
         TodoAdapter.OnTodoCompleteClickListener, TodoAdapter.OnTodoDeleteClickListener {
@@ -115,22 +119,21 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         ideaRepository = new IdeaRepository(this);
 
 
-
-        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+        final LiveData<Idea> liveIdea = ideaRepository.getIdea(id);
+        setUpRecyclerView();
+        liveIdea.observe(this, new Observer<Idea>() {
             @Override
-            public void run() {
-               idea =  ideaRepository.getIdea(id);
-                setUpRecyclerView();
-
-                AppExecutors.getInstance().getMainThread().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUI();
-                    }
-                });
+            public void onChanged(Idea updatedIdea) {
+                liveIdea.removeObserver(this);
+                idea = updatedIdea;
+                updateUI();
+                adapter.setFullPath(idea.getFullPath());
+                adapter.setImageNames(idea.getImageNames());
+                todoAdapter.setTodos(idea.getTodo());
 
             }
         });
+
 
         importImageFAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,8 +163,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
     }
 
     private void killActivity() {
-        Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
-        startActivity(intent);
+
         finish();
     }
 
@@ -176,12 +178,12 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
 
     private void setUpRecyclerView() {
 
-        adapter = new BitmapAdapter(idea.getFullpath(), idea.getImageNames(), this, this, this);
+        adapter = new BitmapAdapter(this, this, this);
 
         detailedRV.setAdapter(adapter);
         detailedRV.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) );
 
-        todoAdapter = new TodoAdapter(idea.getTodo(), this, this, this);
+        todoAdapter = new TodoAdapter(this, this, this);
 
         todoRV.setAdapter(todoAdapter);
         todoRV.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));

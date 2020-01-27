@@ -31,9 +31,8 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
     private OnLongIdeaClickListener onLongIdeaClickListener;
     private CustomFilter filter;
 
-    public IdeaAdapter(List<Idea> ideas, OnIdeaClickListener onIdeaClickListener, OnLongIdeaClickListener onLongIdeaClickListener) {
-        this.ideas = ideas;
-        this.filterList = ideas;
+    public IdeaAdapter(OnIdeaClickListener onIdeaClickListener, OnLongIdeaClickListener onLongIdeaClickListener) {
+
         this.onIdeaClickListener = onIdeaClickListener;
         this.onLongIdeaClickListener = onLongIdeaClickListener;
     }
@@ -79,7 +78,21 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder>{
 
     @Override
     public int getItemCount() {
+        if (this.ideas == null) {
+            return 0;
+        }
         return ideas.size();
+    }
+
+    public List<Idea> getIdeas() {
+        return ideas;
+    }
+
+    public void setIdeas(List<Idea> ideas) {
+
+        this.ideas = ideas;
+        this.filterList = ideas;
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

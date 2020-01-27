@@ -24,7 +24,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     private OnTodoDeleteClickListener onTodoDeleteClickListener;
     private OnTodoCompleteClickListener onTodoCompleteClickListener;
 
-    public TodoAdapter(List<Todo> todos, Context context, OnTodoDeleteClickListener onTodoDeleteClickListener, OnTodoCompleteClickListener onTodoCompleteClickListener) {
+    public TodoAdapter(Context context, OnTodoDeleteClickListener onTodoDeleteClickListener, OnTodoCompleteClickListener onTodoCompleteClickListener) {
         this.todos = todos;
         this.context = context;
         this.onTodoDeleteClickListener = onTodoDeleteClickListener;
@@ -57,8 +57,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
     }
 
+    public void setTodos(List<Todo> todos) {
+        this.todos = todos;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
+        if(todos == null) return 0;
+
         return todos.size();
     }
 

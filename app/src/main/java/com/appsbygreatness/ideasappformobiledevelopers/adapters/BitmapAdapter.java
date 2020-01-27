@@ -28,20 +28,8 @@ public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder
     private OnBitmapClickListener onBitmapClickListener;
     private OnLongBitmapClickListener onLongBitmapClickListener;
 
-    public BitmapAdapter(String fullPath, List<String> imageNames, Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
-        //this.bitmaps = bitmaps;
+    public BitmapAdapter( Context context, OnBitmapClickListener onBitmapClickListener, OnLongBitmapClickListener onLongBitmapClickListener) {
 
-        /*this.fullPath = new ArrayList<>();
-        this.imageNames = new ArrayList<>();*/
-
-
-        this.fullPath = fullPath;
-
-
-        if(imageNames != null){
-
-            this.imageNames = imageNames;
-        }
         this.context = context;
         this.onBitmapClickListener = onBitmapClickListener;
         this.onLongBitmapClickListener = onLongBitmapClickListener;
@@ -78,8 +66,25 @@ public class BitmapAdapter extends RecyclerView.Adapter<BitmapAdapter.ViewHolder
 
     }
 
+
+
+    public void setFullPath(String fullPath) {
+        this.fullPath = fullPath;
+    }
+
+
+
+    public void setImageNames(List<String> imageNames) {
+        this.imageNames = imageNames;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
+
+        if(imageNames == null){
+            return 0;
+        }
         return imageNames.size();
     }
 

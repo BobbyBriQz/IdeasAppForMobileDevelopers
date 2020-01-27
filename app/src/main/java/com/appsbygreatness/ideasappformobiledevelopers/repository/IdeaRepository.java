@@ -1,6 +1,9 @@
 package com.appsbygreatness.ideasappformobiledevelopers.repository;
 
 import android.content.Context;
+
+import androidx.lifecycle.LiveData;
+
 import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.dao.IdeaDao;
 import com.appsbygreatness.ideasappformobiledevelopers.database.IdeaDatabase;
@@ -52,12 +55,12 @@ public class IdeaRepository {
     }
 
 
-    public Idea getIdea(final int id){
+    public LiveData<Idea> getIdea(final int id){
 
         return ideaDao.getIdea(id);
     }
 
-    public List<Idea> getAllIdeas(){
+    public LiveData<List<Idea>> getAllIdeas(){
 
         return ideaDao.getAllIdeas();
     }

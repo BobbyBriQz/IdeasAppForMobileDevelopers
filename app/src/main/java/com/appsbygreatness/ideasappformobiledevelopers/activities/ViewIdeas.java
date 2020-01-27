@@ -34,6 +34,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -126,7 +129,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
                 Intent intent = new Intent(getApplicationContext(), NewIdea.class);
                 startActivity(intent);
-                finish();
+
             }
         });
 
@@ -340,8 +343,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         intent.putExtra("id", id);
 
         startActivity(intent);
-        finish();
-
 
     }
 
@@ -498,14 +499,21 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         ideaRepository = new IdeaRepository(this);
 
-        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+        LiveData<List<Idea>> liveIdeas = ideaRepository.getAllIdeas();
+        setUpRecyclerView();
+
+        liveIdeas.observe(this, new Observer<List<Idea>>() {
             @Override
-            public void run() {
-                ideas = ideaRepository.getAllIdeas();
-                setUpRecyclerView();
+            public void onChanged(List<Idea> updatedIdeas) {
+                ideas = updatedIdeas;
+                ideaAdapter.setIdeas(updatedIdeas);
                 updateHeaderAppCount();
             }
         });
+
+
+
+
 
 
 
@@ -514,7 +522,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
     public void setUpRecyclerView(){
 
         //RecyclerView custom IdeaAdapter is created with the ideas list
-        ideaAdapter = new IdeaAdapter(ideas, this, this);
+        ideaAdapter = new IdeaAdapter(this, this);
 
         //Adapter is attached to the recyclerView instance and preferred Layout is set
         recyclerView.setAdapter(ideaAdapter);
