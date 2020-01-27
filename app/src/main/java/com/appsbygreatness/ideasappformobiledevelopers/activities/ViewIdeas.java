@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 
 import com.appsbygreatness.ideasappformobiledevelopers.AppExecutors;
 import com.appsbygreatness.ideasappformobiledevelopers.R;
+import com.appsbygreatness.ideasappformobiledevelopers.ViewIdeasViewModel;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.IdeaAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.fragments.AboutDeveloperDialogFragment;
 import com.appsbygreatness.ideasappformobiledevelopers.model.Idea;
@@ -35,8 +36,12 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -338,7 +343,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         Intent intent = new Intent(getApplicationContext(), DetailedPage.class);
 
-        int id = ideas.get(position).getId();
+        int id = ideaAdapter.getIdeas().get(position).getId();
 
         intent.putExtra("id", id);
 
@@ -499,10 +504,11 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
         ideaRepository = new IdeaRepository(this);
 
-        LiveData<List<Idea>> liveIdeas = ideaRepository.getAllIdeas();
         setUpRecyclerView();
 
-        liveIdeas.observe(this, new Observer<List<Idea>>() {
+        ViewIdeasViewModel viewModel = ViewModelProviders.of(this).get(ViewIdeasViewModel.class);
+
+        viewModel.getIdeas().observe(this, new Observer<List<Idea>>() {
             @Override
             public void onChanged(List<Idea> updatedIdeas) {
                 ideas = updatedIdeas;
@@ -510,12 +516,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                 updateHeaderAppCount();
             }
         });
-
-
-
-
-
-
 
     }
 
@@ -529,9 +529,9 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-
 
             if (menuItem.getItemId() == R.id.logoutDrawer){
 
@@ -550,7 +550,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                 SharedPreferences.Editor editor = preferences.edit();
                 int currentTheme = AppCompatDelegate.getDefaultNightMode();
 
-
                 if(currentTheme != AppCompatDelegate.MODE_NIGHT_YES){
 
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -558,7 +557,6 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
                     //Save theme choice to SharedPreferences
                     editor.putBoolean("NIGHT MODE", true);
                     editor.apply();
-
 
                 }else{
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -584,8 +582,7 @@ public class ViewIdeas extends AppCompatActivity implements IdeaAdapter.OnIdeaCl
 
 
             }else if(menuItem.getItemId() == R.id.removeAds){
-
-
+                
             }
 
         return false;

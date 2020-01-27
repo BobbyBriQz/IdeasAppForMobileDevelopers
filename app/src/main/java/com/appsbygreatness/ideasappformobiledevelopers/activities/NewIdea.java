@@ -127,7 +127,8 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
         adapter = new BitmapAdapter(this, this, this);
         adapter.setImageNames(imageNames);
         adapter.setFullPath(fullPath);
-        
+
+
         todoAdapter = new TodoAdapter(this, this, this);
         todoAdapter.setTodos(todos);
 
@@ -160,7 +161,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
                 todoAdapter.notifyDataSetChanged();
             }
         });
-
     }
 
     @Override
@@ -208,8 +208,6 @@ public class NewIdea extends AppCompatActivity implements BitmapAdapter.OnBitmap
     }
 
     private void killActivity() {
-        Intent intent = new Intent(getApplicationContext(), ViewIdeas.class);
-        startActivity(intent);
 
         finish();
     }

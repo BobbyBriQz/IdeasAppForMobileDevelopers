@@ -28,6 +28,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -40,6 +42,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.appsbygreatness.ideasappformobiledevelopers.DetailedPageViewModel;
+import com.appsbygreatness.ideasappformobiledevelopers.DetailedPageViewModelFactory;
 import com.appsbygreatness.ideasappformobiledevelopers.R;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.BitmapAdapter;
 import com.appsbygreatness.ideasappformobiledevelopers.adapters.TodoAdapter;
@@ -119,17 +123,18 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         ideaRepository = new IdeaRepository(this);
 
 
-        final LiveData<Idea> liveIdea = ideaRepository.getIdea(id);
+        DetailedPageViewModelFactory factory = new DetailedPageViewModelFactory(ideaRepository,id);
+        final DetailedPageViewModel viewModel = ViewModelProviders.of(this, factory).get(DetailedPageViewModel.class);
         setUpRecyclerView();
-        liveIdea.observe(this, new Observer<Idea>() {
+        viewModel.getIdea().observe(this, new Observer<Idea>() {
             @Override
             public void onChanged(Idea updatedIdea) {
-                liveIdea.removeObserver(this);
+                viewModel.getIdea().removeObserver(this);
                 idea = updatedIdea;
-                updateUI();
-                adapter.setFullPath(idea.getFullPath());
-                adapter.setImageNames(idea.getImageNames());
-                todoAdapter.setTodos(idea.getTodo());
+                updateUI(updatedIdea);
+                adapter.setFullPath(updatedIdea.getFullPath());
+                adapter.setImageNames(updatedIdea.getImageNames());
+                todoAdapter.setTodos(updatedIdea.getTodo());
 
             }
         });
@@ -167,7 +172,7 @@ public class DetailedPage extends AppCompatActivity implements BitmapAdapter.OnB
         finish();
     }
 
-    private void updateUI() {
+    private void updateUI(Idea idea) {
 
         detailedAppName.setText(idea.getName());
         detailedAppIdea.setText(idea.getIdea());
